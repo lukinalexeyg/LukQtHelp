@@ -1,6 +1,7 @@
+#include <QApplication>
 #include <QDesktopWidget>
+#include <QPushButton>
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 
 
