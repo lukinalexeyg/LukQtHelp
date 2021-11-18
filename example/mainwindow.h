@@ -1,12 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#pragma once
+#include "helpviewer.h"
 
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QHBoxLayout>
-#include "helpviewer.h"
 
 class MainWindow : public QMainWindow
 {
@@ -14,11 +13,11 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    void closeEvent(QCloseEvent *);
+    void closeEvent(QCloseEvent*);
 
 private:
-    HelpViewer *helpViewer;
-    QHBoxLayout *hBoxLayout;
+    HelpViewer *m_helpViewer;
+    QHBoxLayout *m_hBoxLayout;
 
     template<typename Func>
     void addPushButton(const QString &name, Func slot);

@@ -1,14 +1,9 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-09-29T11:38:06
-#
-#-------------------------------------------------
-
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = HelpViewer-example
+TARGET = HelpViewerExample
+
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -23,11 +18,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += mainwindow.h
 
-FORMS    +=
+FORMS +=
 
 STATECHARTS +=
 
@@ -37,11 +32,14 @@ DISTFILES +=
 
 include(../HelpViewer/HelpViewer.pri)
 
-CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/release
-CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/debug
+DESTDIR = bin
+MOC_DIR = moc
+OBJECTS_DIR = obj
+RCC_DIR = rcc
+UI_DIR = ui
 
-copy_to_build.path = $$DESTDIR
-copy_to_build.files = help/*
-
-INSTALLS += \
-    copy_to_build
+copydata.commands = $(COPY_DIR) $$shell_path($$PWD/help) $$shell_path($$DESTDIR)
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata

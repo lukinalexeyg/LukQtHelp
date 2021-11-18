@@ -1,7 +1,9 @@
+#include "mainwindow.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QScreen>
 #include <QPushButton>
-#include "mainwindow.h"
 
 
 
@@ -9,31 +11,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(420, 100);
     QRect rect = geometry();
-    rect.moveCenter(QApplication::desktop()->screenGeometry().center());
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    rect.moveCenter(screens.first()->geometry().center());
     setGeometry(rect);
 
-    setWindowTitle(QApplication::applicationName());
+    setWindowTitle(qApp->applicationName());
 
-    helpViewer = new HelpViewer(QApplication::applicationDirPath() + "/ural_ru.qhc", this);
-    helpViewer->setWindowTitle(QApplication::applicationName());
-    helpViewer->setHomeSource("qthelp://ural/doc/about.html");
+    m_helpViewer = new HelpViewer(qApp->applicationDirPath() + QStringLiteral("/ural_ru.qhc"), this);
+    m_helpViewer->setWindowTitle(qApp->applicationName());
+    m_helpViewer->setHomeSource("qthelp://ural/doc/about.html");
 
-    hBoxLayout = new QHBoxLayout;
+    m_hBoxLayout = new QHBoxLayout;
 
-    addPushButton("Empty", [this](){helpViewer->show();});
-    addPushButton("Constructor", [this](){helpViewer->show("qthelp://ural/doc/constructor.html");});
-    addPushButton("Pattern", [this](){helpViewer->show("qthelp://ural/doc/pattern.html");});
+    addPushButton(QStringLiteral("Empty"), [this] { m_helpViewer->show(); });
+    addPushButton(QStringLiteral("Constructor"), [this] { m_helpViewer->show(QStringLiteral("qthelp://ural/doc/constructor.html")); });
+    addPushButton(QStringLiteral("Pattern"), [this] { m_helpViewer->show(QStringLiteral("qthelp://ural/doc/pattern.html")); });
 
     QWidget *centralWidget = new QWidget(this);
-    centralWidget->setLayout(hBoxLayout);
+    centralWidget->setLayout(m_hBoxLayout);
     setCentralWidget(centralWidget);
 }
 
 
 
-void MainWindow::closeEvent(QCloseEvent *)
+void MainWindow::closeEvent(QCloseEvent*)
 {
-    helpViewer->close();
+    m_helpViewer->close();
 }
 
 
@@ -44,9 +47,9 @@ void MainWindow::addPushButton(const QString &name, Func slot)
     QPushButton *pushButton = new QPushButton(name, this);
 
     pushButton->setFixedSize(120, 40);
-    pushButton->setStyleSheet("font-size: 12pt");
+    pushButton->setStyleSheet(QStringLiteral("font-size: 12pt"));
 
-    hBoxLayout->addWidget(pushButton);
+    m_hBoxLayout->addWidget(pushButton);
 
     connect(pushButton, &QPushButton::released, this, slot);
 }
