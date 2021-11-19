@@ -110,7 +110,7 @@ bool HelpViewer::event(QEvent *event)
                 m_helpWindowPosition = m_helpWindow->pos();
                 m_helpWindowSize = m_helpWindow->size();
                 m_horizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
-                m_lastValidSource = m_helpWindow->lastSource();
+                m_lastValidSource = m_helpWindow->lastSource().toString();
                 m_helpWindow = nullptr;
                 m_helpEngine->deleteLater();
                 m_helpEngine = nullptr;

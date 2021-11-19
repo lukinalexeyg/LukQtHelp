@@ -11,7 +11,9 @@ public:
     HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent = nullptr);
 
     virtual void setSource(const QUrl &url) override;
+
     inline void setOpenExternalLinksEnabled(const bool enabled) { m_openExternalLinksEnabled = enabled; }
+    inline bool openExternalLinksEnabled() const                { return m_openExternalLinksEnabled; }
 
 protected:
     virtual void wheelEvent(QWheelEvent *event) override;

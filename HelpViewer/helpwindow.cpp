@@ -1,4 +1,5 @@
 #include "helpwindow.h"
+#include "helptoolbar.h"
 
 #include <QGridLayout>
 #include <QHelpContentWidget>
@@ -15,7 +16,6 @@ HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     m_helpContentModel = helpEngine->contentModel();
 
     setToolBar();
-    retranslate();
     setContent();
 
     m_statusBar = new QStatusBar(this);
@@ -26,92 +26,55 @@ HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     });
 
     connect(m_helpTextBrowser, QOverload<const QUrl &>::of(&QTextBrowser::highlighted), this, [this](const QUrl &link) {
-        m_statusBar->showMessage(link.toString()); });
+        m_statusBar->showMessage(link.toString());
+    });
 }
 
 
 
-void HelpWindow::changeEvent(QEvent *event)
+void HelpWindow::setSource(const QUrl &source)
 {
-    if (event->type() == QEvent::LanguageChange)
-        retranslate();
-    IndependentWindow::changeEvent(event);
+    m_helpTextBrowser->setSource(source);
 }
 
 
 
-void HelpWindow::retranslate()
+void HelpWindow::setHomeSource(const QUrl &source)
 {
-    m_showHideContentsAction->setText(tr("Show/hide content"));
-    m_homeContentAction->setText(tr("Home"));
-    m_backContentAction->setText(tr("Back"));
-    m_forwardContentAction->setText(tr("Forward"));
+    if (!m_helpEngine->fileData(source).isEmpty())
+        m_homeSource = source;
 }
 
 
 
-void HelpWindow::setSource(const QString &source)
-{
-    m_helpTextBrowser->setSource(QUrl(source));
-}
-
-
-
-void HelpWindow::setHomeSource(const QString &source)
-{
-    if (!m_helpEngine->fileData(QUrl(source)).isEmpty())
-        m_homeSource = QUrl(source);
-}
-
-
-
-QString HelpWindow::lastSource() const
+QUrl HelpWindow::lastSource() const
 {
     if (m_helpTextBrowser != nullptr)
-        return m_helpTextBrowser->historyUrl(0).toString();
+        return m_helpTextBrowser->historyUrl(0);
 
-    return QString();
+    return QUrl();
 }
 
 
 
 void HelpWindow::setToolBar()
 {
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->setFloatable(false);
-    toolBar->setMovable(false);
-    toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-    toolBar->setStyleSheet(QStringLiteral("QToolBar {padding: 5}"
-                                          "QToolBar QToolButton {padding: 2; margin: 0}"));
-    toolBar->setWindowTitle(tr("Toolbar"));
+    HelpToolBar *helpToolBar = new HelpToolBar(this);
 
-    m_showHideContentsAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-menu.svg")), QString(),
-                                                  this, &HelpWindow::showHideContents);
-
-    toolBar->addSeparator();
-
-    m_homeContentAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-home.svg")), QString(), m_helpTextBrowser, [this]() {
+    connect(helpToolBar, &HelpToolBar::contentsTriggered, this, &HelpWindow::showHideContents);
+    connect(helpToolBar, &HelpToolBar::homeTriggered, this, [this]() {
         if (m_homeSource.isEmpty())
             m_helpTextBrowser->home();
         else
             m_helpTextBrowser->setSource(m_homeSource);
     });
+    connect(helpToolBar, &HelpToolBar::backwardTriggered, m_helpTextBrowser, &HelpTextBrowser::backward);
+    connect(helpToolBar, &HelpToolBar::forwardTriggered, m_helpTextBrowser, &HelpTextBrowser::forward);
 
-    m_backContentAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-arrow-left.svg")), QString(),
-                                             m_helpTextBrowser, &HelpTextBrowser::backward);
+    connect(m_helpTextBrowser, &HelpTextBrowser::backwardAvailable, helpToolBar, &HelpToolBar::setBackwardEnabled);
+    connect(m_helpTextBrowser, &HelpTextBrowser::forwardAvailable, helpToolBar, &HelpToolBar::setForwardEnabled);
 
-    m_forwardContentAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-arrow-right.svg")), QString(),
-                                                m_helpTextBrowser, &HelpTextBrowser::forward);
-
-    connect(m_helpTextBrowser, &HelpTextBrowser::backwardAvailable, m_backContentAction, &QAction::setEnabled);
-    connect(m_helpTextBrowser, &HelpTextBrowser::forwardAvailable, m_forwardContentAction, &QAction::setEnabled);
-
-    m_showHideContentsAction->setShortcut(Qt::Key_F2);
-    m_backContentAction->setShortcut(QKeySequence::MoveToPreviousPage);
-    m_homeContentAction->setShortcut(QKeySequence::MoveToStartOfLine);
-    m_forwardContentAction->setShortcut(QKeySequence::MoveToNextPage);
-
-    addToolBar(toolBar);
+    addToolBar(helpToolBar);
 }
 
 

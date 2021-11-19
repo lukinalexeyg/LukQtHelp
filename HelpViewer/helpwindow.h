@@ -13,18 +13,15 @@ class HelpWindow : public IndependentWindow
 public:
     HelpWindow(QHelpEngine *helpEngine, QWidget *parent = nullptr);
 
-    void setSource(const QString &source);
-    void setHomeSource(const QString &source);
-    QString lastSource() const;
+    void setSource(const QUrl &source);
+    void setHomeSource(const QUrl &source);
+    QUrl lastSource() const;
 
     inline void setOpenExternalLinksEnabled(const bool enabled)     { m_helpTextBrowser->setOpenExternalLinksEnabled(enabled); }
-    inline bool openExternalLinks() const                           { return m_helpTextBrowser->openExternalLinks(); }
+    inline bool openExternalLinks() const                           { return m_helpTextBrowser->openExternalLinksEnabled(); }
 
     inline void setHorizontalSplitterSizes(const QList<int> &sizes) { m_horizontalSplitter->setSizes(sizes); }
     inline QList<int> horizontalSplitterSizes() const               { return m_horizontalSplitter->sizes(); }
-
-protected:
-    void changeEvent(QEvent *event);
 
 private:
     QHelpEngine *m_helpEngine;
@@ -35,13 +32,7 @@ private:
     QStatusBar *m_statusBar;
     QUrl m_homeSource;
 
-    QAction *m_showHideContentsAction;
-    QAction *m_homeContentAction;
-    QAction *m_backContentAction;
-    QAction *m_forwardContentAction;
-
 private:
-    void retranslate();
     void setToolBar();
     void setContent();
     void showHideContents();
