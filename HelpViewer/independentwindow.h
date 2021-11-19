@@ -1,7 +1,5 @@
-#ifndef INSTANTDELETEDWINDOW_H
-#define INSTANTDELETEDWINDOW_H
-
-#pragma once
+#ifndef INDEPENDENTWINDOW_H
+#define INDEPENDENTWINDOW_H
 
 #include <QMainWindow>
 #include <QCloseEvent>
@@ -12,7 +10,8 @@ class IndependentWindow : public QMainWindow
 
 public:
     explicit IndependentWindow(QWidget *parent = nullptr);
-    void setSize(QSize size, QWidget *basisWidget = Q_NULLPTR);
+
+    void setSize(QSize size, QWidget *basisWidget = nullptr);
 
 signals:
     void closed();
@@ -21,4 +20,4 @@ protected:
    void closeEvent(QCloseEvent *event);
 };
 
-#endif // INSTANTDELETEDWINDOW_H
+#endif // INDEPENDENTWINDOW_H

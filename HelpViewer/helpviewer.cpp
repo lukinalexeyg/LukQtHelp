@@ -1,13 +1,15 @@
+#include "helpviewer.h"
+
 #include <QApplication>
 #include <QDesktopServices>
-#include "helpviewer.h"
 
 
 
 HelpViewer::HelpViewer(QWidget *parent) :
     QObject(parent),
     m_basisWidget(parent)
-{}
+{
+}
 
 
 
@@ -15,7 +17,8 @@ HelpViewer::HelpViewer(const QString &collectionFile, QWidget *parent) :
     QObject(parent),
     m_basisWidget(parent),
     m_collectionFile(collectionFile)
-{}
+{
+}
 
 
 
@@ -28,9 +31,9 @@ HelpViewer::~HelpViewer()
 
 void HelpViewer::setWindowTitle(const QString &title)
 {
-    helpWindowTitle = title;
-    if (helpWindow != Q_NULLPTR)
-        helpWindow->setWindowTitle(helpWindowTitle);
+    m_helpWindowTitle = title;
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setWindowTitle(m_helpWindowTitle);
 }
 
 
@@ -39,7 +42,7 @@ void HelpViewer::setCollectionFile(const QString &collectionFile)
 {
     if (collectionFile != m_collectionFile) {
         m_collectionFile = collectionFile;
-        collectionFileChanged = true;
+        m_collectionFileChanged = true;
     }
 }
 
@@ -48,24 +51,24 @@ void HelpViewer::setCollectionFile(const QString &collectionFile)
 void HelpViewer::setHomeSource(const QString &source)
 {
     m_homeSource = source;
-    if (helpWindow != Q_NULLPTR)
-        helpWindow->setHomeSource(m_homeSource);
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setHomeSource(m_homeSource);
 }
 
 
 
-void HelpViewer::setOpenExternalLinks(bool open)
+void HelpViewer::setOpenExternalLinksEnabled(const bool enabled)
 {
-    m_openExternalLinks = open;
-    if (helpWindow != Q_NULLPTR)
-        helpWindow->setOpenExternalLinks(m_openExternalLinks);
+    m_openExternalLinks = enabled;
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinks);
 }
 
 
 
 bool HelpViewer::show(const QString &source)
 {
-    if (!source.startsWith("http")) {
+    if (!source.startsWith(QStringLiteral("http"))) {
         if (check(source)) {
             m_source = source;
             moveToThread(QApplication::instance()->thread());
@@ -85,40 +88,40 @@ bool HelpViewer::event(QEvent *event)
 {
     if (event->type() == QEvent::User) {
 
-        if (helpWindow == Q_NULLPTR) {
-            helpWindow = new HelpWindow(helpEngine);
-            helpWindow->setWindowState(helpWindowStates);
-            helpWindow->setWindowTitle(helpWindowTitle);
+        if (m_helpWindow == nullptr) {
+            m_helpWindow = new HelpWindow(m_helpEngine);
+            m_helpWindow->setWindowState(m_helpWindowStates);
+            m_helpWindow->setWindowTitle(m_helpWindowTitle);
 
-            if (!helpWindowPosition.isNull()) {
-                helpWindow->move(helpWindowPosition);
-                helpWindow->setSize(helpWindowSize);
+            if (!m_helpWindowPosition.isNull()) {
+                m_helpWindow->move(m_helpWindowPosition);
+                m_helpWindow->setSize(m_helpWindowSize);
             }
             else
-                helpWindow->setSize(helpWindowSize, m_basisWidget);
+                m_helpWindow->setSize(m_helpWindowSize, m_basisWidget);
 
-            helpWindow->setHorizontalSplitterSizes(horizontalSplitterSizes);
-            helpWindow->setSource(m_lastValidSource);
-            helpWindow->setHomeSource(m_homeSource);
-            helpWindow->setOpenExternalLinks(m_openExternalLinks);
+            m_helpWindow->setHorizontalSplitterSizes(m_horizontalSplitterSizes);
+            m_helpWindow->setSource(m_lastValidSource);
+            m_helpWindow->setHomeSource(m_homeSource);
+            m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinks);
 
-            connect(helpWindow, &HelpWindow::destroyed, [this](){
-                helpWindowStates = helpWindow->windowState();
-                helpWindowPosition = helpWindow->pos();
-                helpWindowSize = helpWindow->size();
-                horizontalSplitterSizes = helpWindow->horizontalSplitterSizes();
-                m_lastValidSource = helpWindow->lastSource();
-                helpWindow = Q_NULLPTR;
-                helpEngine->deleteLater();
-                helpEngine = Q_NULLPTR;
+            connect(m_helpWindow, &HelpWindow::destroyed, this, [this] {
+                m_helpWindowStates = m_helpWindow->windowState();
+                m_helpWindowPosition = m_helpWindow->pos();
+                m_helpWindowSize = m_helpWindow->size();
+                m_horizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
+                m_lastValidSource = m_helpWindow->lastSource();
+                m_helpWindow = nullptr;
+                m_helpEngine->deleteLater();
+                m_helpEngine = nullptr;
             });
 
-            helpWindow->show();
+            m_helpWindow->show();
         }
 
         else {
-            helpWindow->setSource(m_source);
-            helpWindow->activateWindow();
+            m_helpWindow->setSource(m_source);
+            m_helpWindow->activateWindow();
         }
 
         return true;
@@ -137,8 +140,8 @@ bool HelpViewer::check(const QString &source)
     QHelpEngine *checkHelpEngine;
     bool sucessful = true;
 
-    if (helpEngine != Q_NULLPTR && !collectionFileChanged)
-        checkHelpEngine = helpEngine;
+    if (m_helpEngine != nullptr && !m_collectionFileChanged)
+        checkHelpEngine = m_helpEngine;
     else {
         checkHelpEngine = new QHelpEngine(m_collectionFile, this);
         if (!checkHelpEngine->setupData())
@@ -159,14 +162,14 @@ bool HelpViewer::check(const QString &source)
             m_lastValidSource = m_homeSource;
 
         else {
-            QStringList startFiles = {"index.html", "index.htm"};
+            const QStringList startFiles = {QStringLiteral("index.html"), QStringLiteral("index.htm")};
             sucessful = false;
 
             for (const QString &registeredDocumentation : checkHelpEngine->registeredDocumentations()) {
 
                 for (const QUrl &file : checkHelpEngine->files(registeredDocumentation, QStringList())) {
                     const QString source = file.toString();
-                    const QString fileName = source.section('/', -1);
+                    const QString fileName = source.section(QStringLiteral("/"), -1);
 
                     for (const QString &startFile : qAsConst(startFiles)) {
                         if (startFile == fileName && !checkHelpEngine->fileData(file).isEmpty()) {
@@ -188,15 +191,15 @@ bool HelpViewer::check(const QString &source)
 
     DONE:
 
-    if (helpEngine == Q_NULLPTR) {
+    if (m_helpEngine == nullptr) {
         if (sucessful)
-            helpEngine = checkHelpEngine;
+            m_helpEngine = checkHelpEngine;
         else
             checkHelpEngine->deleteLater();
     }
-    else if (collectionFileChanged) {
+    else if (m_collectionFileChanged) {
         if (sucessful)
-            helpEngine->setCollectionFile(m_collectionFile);
+            m_helpEngine->setCollectionFile(m_collectionFile);
         checkHelpEngine->deleteLater();
     }
 
@@ -207,6 +210,6 @@ bool HelpViewer::check(const QString &source)
 
 void HelpViewer::close()
 {
-    if (helpWindow != Q_NULLPTR)
-        helpWindow->close();
+    if (m_helpWindow != nullptr)
+        m_helpWindow->close();
 }

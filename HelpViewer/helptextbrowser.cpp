@@ -1,30 +1,32 @@
-#include <QDesktopServices>
 #include "helptextbrowser.h"
+
+#include <QDesktopServices>
 
 
 
 HelpTextBrowser::HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent) :
     QTextBrowser(parent),
-    helpEngine(helpEngine)
-{}
+    m_helpEngine(helpEngine)
+{
+}
 
 
 
 void HelpTextBrowser::setSource(const QUrl &url)
 {
-    if (!url.toString().startsWith("http"))
+    if (!url.toString().startsWith(QStringLiteral("http")))
         QTextBrowser::setSource(url);
 
-    else if (m_openExternalLinks)
+    else if (m_openExternalLinksEnabled)
         QDesktopServices::openUrl(url);
 }
 
 
 
-QVariant HelpTextBrowser::loadResource(int type, const QUrl &name)
+QVariant HelpTextBrowser::loadResource(const int type, const QUrl &name)
 {
-    if (name.scheme() == "qthelp")
-        return QVariant(helpEngine->fileData(name));
+    if (name.scheme() == QStringLiteral("qthelp"))
+        return m_helpEngine->fileData(name);
 
     return QTextBrowser::loadResource(type, name);
 }

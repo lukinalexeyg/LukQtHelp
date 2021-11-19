@@ -2,7 +2,7 @@ INCLUDEPATH += $$PWD
 
 DEPENDPATH += $$PWD
 
-QT       += core gui help sql
+QT += core gui help sql
 
 SOURCES += \
     $$PWD/helptextbrowser.cpp \

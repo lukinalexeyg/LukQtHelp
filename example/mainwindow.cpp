@@ -10,8 +10,9 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(420, 100);
+
     QRect rect = geometry();
-    const QList<QScreen*> screens = QGuiApplication::screens();
+    const QList<QScreen*> screens = qApp->screens();
     rect.moveCenter(screens.first()->geometry().center());
     setGeometry(rect);
 

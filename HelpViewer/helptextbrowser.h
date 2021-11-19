@@ -1,8 +1,6 @@
 #ifndef HELPTEXTBROWSER_H
 #define HELPTEXTBROWSER_H
 
-#pragma once
-
 #include <QTextBrowser>
 #include <QtHelp/QHelpEngine>
 #include <QWheelEvent>
@@ -11,16 +9,19 @@ class HelpTextBrowser : public QTextBrowser
 {
 public:
     HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent = nullptr);
-    void setSource(const QUrl &url);
-    inline void _setOpenExternalLinks(bool open) {m_openExternalLinks = open;}
+
+    virtual void setSource(const QUrl &url) override;
+    inline void setOpenExternalLinksEnabled(const bool enabled) { m_openExternalLinksEnabled = enabled; }
 
 protected:
-    void wheelEvent(QWheelEvent *event);
+    virtual void wheelEvent(QWheelEvent *event) override;
 
 private:
-    QHelpEngine *helpEngine;
-    bool m_openExternalLinks;
-    QVariant loadResource (int type, const QUrl &name);
+    QHelpEngine *m_helpEngine;
+    bool m_openExternalLinksEnabled;
+
+private:
+    virtual QVariant loadResource (const int type, const QUrl &name) override;
 };
 
 #endif // HELPTEXTBROWSER_H

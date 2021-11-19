@@ -5,8 +5,8 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QApplication::setApplicationName("HelpViewerExample");
-    QApplication::setOrganizationName("Alexey Lukin");
+    QApplication::setApplicationName(QStringLiteral("HelpViewerExample"));
+    QApplication::setOrganizationName(QStringLiteral("Alexey Lukin"));
 
     MainWindow mainWindow;
     mainWindow.show();

@@ -1,31 +1,32 @@
-#include <QHelpContentWidget>
-#include <QToolBar>
-#include <QStatusBar>
-#include <QGridLayout>
 #include "helpwindow.h"
+
+#include <QGridLayout>
+#include <QHelpContentWidget>
+#include <QStatusBar>
+#include <QToolBar>
 
 
 
 HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     IndependentWindow(parent),
-    helpEngine(helpEngine)
+    m_helpEngine(helpEngine)
 {
-    helpTextBrowser = new HelpTextBrowser(helpEngine, this);
-    helpContentModel = helpEngine->contentModel();
+    m_helpTextBrowser = new HelpTextBrowser(helpEngine, this);
+    m_helpContentModel = helpEngine->contentModel();
 
     setToolBar();
     retranslate();
     setContent();
 
-    statusBar = new QStatusBar(this);
-    setStatusBar(statusBar);
+    m_statusBar = new QStatusBar(this);
+    setStatusBar(m_statusBar);
 
-    connect(helpEngine->contentWidget(), &QHelpContentWidget::pressed, this, [this](const QModelIndex &modelIndex){
-        helpTextBrowser->setSource(helpContentModel->contentItemAt(modelIndex)->url());
+    connect(helpEngine->contentWidget(), &QHelpContentWidget::pressed, this, [this](const QModelIndex &modelIndex) {
+        m_helpTextBrowser->setSource(m_helpContentModel->contentItemAt(modelIndex)->url());
     });
 
-    connect(helpTextBrowser, QOverload<const QString &>::of(&QTextBrowser::highlighted),
-            [=](const QString &link){statusBar->showMessage(link);});
+    connect(m_helpTextBrowser, QOverload<const QUrl &>::of(&QTextBrowser::highlighted), this, [this](const QUrl &link) {
+        m_statusBar->showMessage(link.toString()); });
 }
 
 
@@ -41,35 +42,35 @@ void HelpWindow::changeEvent(QEvent *event)
 
 void HelpWindow::retranslate()
 {
-    showHideContentsAction->setText(tr("Show/hide content"));
-    homeContentAction->setText(tr("Home"));
-    backContentAction->setText(tr("Back"));
-    forwardContentAction->setText(tr("Forward"));
+    m_showHideContentsAction->setText(tr("Show/hide content"));
+    m_homeContentAction->setText(tr("Home"));
+    m_backContentAction->setText(tr("Back"));
+    m_forwardContentAction->setText(tr("Forward"));
 }
 
 
 
 void HelpWindow::setSource(const QString &source)
 {
-    helpTextBrowser->setSource(QUrl(source));
+    m_helpTextBrowser->setSource(QUrl(source));
 }
 
 
 
 void HelpWindow::setHomeSource(const QString &source)
 {
-    if (!helpEngine->fileData(QUrl(source)).isEmpty())
-        homeSource = QUrl(source);
+    if (!m_helpEngine->fileData(QUrl(source)).isEmpty())
+        m_homeSource = QUrl(source);
 }
 
 
 
-QString HelpWindow::lastSource()
+QString HelpWindow::lastSource() const
 {
-    if (helpTextBrowser != Q_NULLPTR)
-        return helpTextBrowser->historyUrl(0).toString();
+    if (m_helpTextBrowser != nullptr)
+        return m_helpTextBrowser->historyUrl(0).toString();
 
-    return "";
+    return QString();
 }
 
 
@@ -80,31 +81,35 @@ void HelpWindow::setToolBar()
     toolBar->setFloatable(false);
     toolBar->setMovable(false);
     toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-    toolBar->setStyleSheet("QToolBar {padding: 5}"
-                           "QToolBar QToolButton {padding: 2; margin: 0}");
+    toolBar->setStyleSheet(QStringLiteral("QToolBar {padding: 5}"
+                                          "QToolBar QToolButton {padding: 2; margin: 0}"));
     toolBar->setWindowTitle(tr("Toolbar"));
 
-    showHideContentsAction = toolBar->addAction(QIcon(":/images/icon-menu.svg"), "", this, &HelpWindow::showHideContents);
+    m_showHideContentsAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-menu.svg")), QString(),
+                                                  this, &HelpWindow::showHideContents);
 
     toolBar->addSeparator();
 
-    homeContentAction = toolBar->addAction(QIcon(":/images/icon-home.svg"), "", helpTextBrowser, [this](){
-        if (homeSource.isEmpty())
-            helpTextBrowser->home();
+    m_homeContentAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-home.svg")), QString(), m_helpTextBrowser, [this]() {
+        if (m_homeSource.isEmpty())
+            m_helpTextBrowser->home();
         else
-            helpTextBrowser->setSource(homeSource);
+            m_helpTextBrowser->setSource(m_homeSource);
     });
 
-    backContentAction = toolBar->addAction(QIcon(":/images/icon-arrow-left.svg"), "", helpTextBrowser, &HelpTextBrowser::backward);
-    forwardContentAction = toolBar->addAction(QIcon(":/images/icon-arrow-right.svg"), "", helpTextBrowser, &HelpTextBrowser::forward);
+    m_backContentAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-arrow-left.svg")), QString(),
+                                             m_helpTextBrowser, &HelpTextBrowser::backward);
 
-    connect(helpTextBrowser, &HelpTextBrowser::backwardAvailable, backContentAction, &QAction::setEnabled);
-    connect(helpTextBrowser, &HelpTextBrowser::forwardAvailable, forwardContentAction, &QAction::setEnabled);
+    m_forwardContentAction = toolBar->addAction(QIcon(QStringLiteral(":/images/icon-arrow-right.svg")), QString(),
+                                                m_helpTextBrowser, &HelpTextBrowser::forward);
 
-    showHideContentsAction->setShortcut(Qt::Key_F2);
-    backContentAction->setShortcut(QKeySequence::MoveToPreviousPage);
-    homeContentAction->setShortcut(QKeySequence::MoveToStartOfLine);
-    forwardContentAction->setShortcut(QKeySequence::MoveToNextPage);
+    connect(m_helpTextBrowser, &HelpTextBrowser::backwardAvailable, m_backContentAction, &QAction::setEnabled);
+    connect(m_helpTextBrowser, &HelpTextBrowser::forwardAvailable, m_forwardContentAction, &QAction::setEnabled);
+
+    m_showHideContentsAction->setShortcut(Qt::Key_F2);
+    m_backContentAction->setShortcut(QKeySequence::MoveToPreviousPage);
+    m_homeContentAction->setShortcut(QKeySequence::MoveToStartOfLine);
+    m_forwardContentAction->setShortcut(QKeySequence::MoveToNextPage);
 
     addToolBar(toolBar);
 }
@@ -113,24 +118,24 @@ void HelpWindow::setToolBar()
 
 void HelpWindow::setContent()
 {
-    horizontalSplitter = new QSplitter(Qt::Horizontal);
-    horizontalSplitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_horizontalSplitter = new QSplitter(Qt::Horizontal);
+    m_horizontalSplitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    horizontalSplitter->addWidget(helpEngine->contentWidget());
-    horizontalSplitter->addWidget(helpTextBrowser);
+    m_horizontalSplitter->addWidget(m_helpEngine->contentWidget());
+    m_horizontalSplitter->addWidget(m_helpTextBrowser);
 
-    horizontalSplitter->setStretchFactor(0, 0);
-    horizontalSplitter->setStretchFactor(1, 1);
+    m_horizontalSplitter->setStretchFactor(0, 0);
+    m_horizontalSplitter->setStretchFactor(1, 1);
 
-    horizontalSplitter->setCollapsible(0, true);
-    horizontalSplitter->setCollapsible(1, false);
+    m_horizontalSplitter->setCollapsible(0, true);
+    m_horizontalSplitter->setCollapsible(1, false);
 
-    horizontalSplitter->setSizes(m_horizontalSplitterSizes);
+    m_horizontalSplitter->setSizes(m_horizontalSplitterSizes);
 
     QGridLayout *gridLayout = new QGridLayout;
     gridLayout->setAlignment(Qt::AlignCenter);
     gridLayout->setContentsMargins(5, 5, 5, 0);
-    gridLayout->addWidget(horizontalSplitter, 0, 0);
+    gridLayout->addWidget(m_horizontalSplitter, 0, 0);
 
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(gridLayout);
@@ -141,12 +146,12 @@ void HelpWindow::setContent()
 
 void HelpWindow::showHideContents()
 {
-    if (helpEngine->contentWidget()->width() > 0) {
-        m_horizontalSplitterSizes = horizontalSplitter->sizes();
+    if (m_helpEngine->contentWidget()->width() > 0) {
+        m_horizontalSplitterSizes = m_horizontalSplitter->sizes();
         QList<int> newHorizontalSizes;
         newHorizontalSizes << 0 << 800;
-        horizontalSplitter->setSizes(newHorizontalSizes);
+        m_horizontalSplitter->setSizes(newHorizontalSizes);
     }
     else
-        horizontalSplitter->setSizes(m_horizontalSplitterSizes);
+        m_horizontalSplitter->setSizes(m_horizontalSplitterSizes);
 }

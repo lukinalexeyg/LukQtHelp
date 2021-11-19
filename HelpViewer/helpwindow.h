@@ -1,11 +1,10 @@
 #ifndef HELPWINDOW_H
 #define HELPWINDOW_H
 
-#pragma once
-
-#include <QSplitter>
 #include "independentwindow.h"
 #include "helptextbrowser.h"
+
+#include <QSplitter>
 
 class HelpWindow : public IndependentWindow
 {
@@ -16,31 +15,32 @@ public:
 
     void setSource(const QString &source);
     void setHomeSource(const QString &source);
-    QString lastSource();
+    QString lastSource() const;
 
-    inline void setOpenExternalLinks(bool open)                     {helpTextBrowser->_setOpenExternalLinks(open);}
-    inline bool openExternalLinks()                                 {return helpTextBrowser->openExternalLinks();}
+    inline void setOpenExternalLinksEnabled(const bool enabled)     { m_helpTextBrowser->setOpenExternalLinksEnabled(enabled); }
+    inline bool openExternalLinks() const                           { return m_helpTextBrowser->openExternalLinks(); }
 
-    inline void setHorizontalSplitterSizes(const QList<int> &sizes) {horizontalSplitter->setSizes(sizes);}
-    inline QList<int> horizontalSplitterSizes()                     {return horizontalSplitter->sizes();}
+    inline void setHorizontalSplitterSizes(const QList<int> &sizes) { m_horizontalSplitter->setSizes(sizes); }
+    inline QList<int> horizontalSplitterSizes() const               { return m_horizontalSplitter->sizes(); }
 
 protected:
     void changeEvent(QEvent *event);
 
 private:
-    QHelpEngine *helpEngine;
-    HelpTextBrowser *helpTextBrowser;
-    QHelpContentModel *helpContentModel;
-    QSplitter *horizontalSplitter;
-    QList<int> m_horizontalSplitterSizes = {200, 600};
-    QStatusBar *statusBar;
-    QUrl homeSource;
+    QHelpEngine *m_helpEngine;
+    HelpTextBrowser *m_helpTextBrowser;
+    QHelpContentModel *m_helpContentModel;
+    QSplitter *m_horizontalSplitter;
+    QList<int> m_horizontalSplitterSizes = { 200, 600 };
+    QStatusBar *m_statusBar;
+    QUrl m_homeSource;
 
-    QAction *showHideContentsAction;
-    QAction *homeContentAction;
-    QAction *backContentAction;
-    QAction *forwardContentAction;
+    QAction *m_showHideContentsAction;
+    QAction *m_homeContentAction;
+    QAction *m_backContentAction;
+    QAction *m_forwardContentAction;
 
+private:
     void retranslate();
     void setToolBar();
     void setContent();
