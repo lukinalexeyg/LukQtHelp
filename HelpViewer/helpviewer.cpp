@@ -42,6 +42,7 @@ void HelpViewer::setCollectionFile(const QString &collectionFile)
 void HelpViewer::setWindowTitle(const QString &title)
 {
     m_helpWindowTitle = title;
+
     if (m_helpWindow != nullptr)
         m_helpWindow->setWindowTitle(title);
 }
@@ -51,6 +52,7 @@ void HelpViewer::setWindowTitle(const QString &title)
 void HelpViewer::setHomeSource(const QUrl &source)
 {
     m_homeSource = source;
+
     if (m_helpWindow != nullptr)
         m_helpWindow->setHomeSource(source);
 }
@@ -60,6 +62,7 @@ void HelpViewer::setHomeSource(const QUrl &source)
 void HelpViewer::setOpenExternalLinksEnabled(const bool enabled)
 {
     m_openExternalLinksEnabled = enabled;
+
     if (m_helpWindow != nullptr)
         m_helpWindow->setOpenExternalLinksEnabled(enabled);
 }
@@ -74,6 +77,7 @@ bool HelpViewer::open(const QUrl &source)
             return true;
         }
     }
+
     else if (m_openExternalLinksEnabled)
         return QDesktopServices::openUrl(source);
 
@@ -87,73 +91,79 @@ bool HelpViewer::check(const QUrl &source)
     if (m_collectionFile.isEmpty())
         return false;
 
-    QHelpEngine *checkHelpEngine;
+    QHelpEngine *helpEngine;
     bool sucessful = true;
 
     if (m_helpEngine != nullptr && !m_collectionFileChanged)
-        checkHelpEngine = m_helpEngine;
+        helpEngine = m_helpEngine;
     else {
-        checkHelpEngine = new QHelpEngine(m_collectionFile, this);
-        if (!checkHelpEngine->setupData())
+        helpEngine = new QHelpEngine(m_collectionFile, this);
+        if (!helpEngine->setupData())
             sucessful = false;
     }
 
     if (sucessful) {
         if (!source.isEmpty()) {
-            if (!checkHelpEngine->fileData(source).isEmpty())
+            if (!helpEngine->fileData(source).isEmpty())
                 m_lastValidSource = source;
             else
                 sucessful = false;
         }
 
-        else if (!m_lastValidSource.isEmpty() && !checkHelpEngine->fileData(m_lastValidSource).isEmpty()) {}
+        else if (!m_lastValidSource.isEmpty() && !helpEngine->fileData(m_lastValidSource).isEmpty()) {
+            // use m_lastValidSource
+        }
 
-        else if (!m_homeSource.isEmpty() && !checkHelpEngine->fileData(m_homeSource).isEmpty())
+        else if (!m_homeSource.isEmpty() && !helpEngine->fileData(m_homeSource).isEmpty()) {
+            // use m_homeSource
             m_lastValidSource = m_homeSource;
+        }
 
         else {
-            const QStringList startFiles = {QStringLiteral("index.html"), QStringLiteral("index.htm")};
-            sucessful = false;
+            const QStringList documentations = helpEngine->registeredDocumentations();
 
-            for (const QString &registeredDocumentation : checkHelpEngine->registeredDocumentations()) {
+            QUrl file = findFile(helpEngine, documentations, QStringLiteral("index.htm"));
 
-                for (const QUrl &file : checkHelpEngine->files(registeredDocumentation, QStringList())) {
-                    const QString source = file.toString();
-                    const QString fileName = source.section(QStringLiteral("/"), -1);
+            if (!file.isEmpty())
+                file = findFile(helpEngine, documentations);
 
-                    for (const QString &startFile : qAsConst(startFiles)) {
-                        if (startFile == fileName && !checkHelpEngine->fileData(file).isEmpty()) {
-                            m_lastValidSource = source;
-                            sucessful = true;
-                            goto DONE;
-                        }
-                    }
-
-                    if (!checkHelpEngine->fileData(file).isEmpty()) {
-                        m_lastValidSource = source;
-                        sucessful = true;
-                        goto DONE;
-                    }
-                }
+            if (file.isEmpty())
+                sucessful = false;
+            else {
+                m_lastValidSource = file;
+                sucessful = true;
             }
         }
     }
 
-    DONE:
-
     if (m_helpEngine == nullptr) {
         if (sucessful)
-            m_helpEngine = checkHelpEngine;
+            m_helpEngine = helpEngine;
         else
-            checkHelpEngine->deleteLater();
+            helpEngine->deleteLater();
     }
     else if (m_collectionFileChanged) {
         if (sucessful)
             m_helpEngine->setCollectionFile(m_collectionFile);
-        checkHelpEngine->deleteLater();
+        helpEngine->deleteLater();
     }
 
     return sucessful;
+}
+
+
+
+QUrl HelpViewer::findFile(QHelpEngine *helpEngine, const QStringList &documentations, const QString &fileName) const
+{
+    for (const QString &documentation : qAsConst(documentations)) {
+        const QList<QUrl> files = helpEngine->files(documentation, QStringList());
+
+        for (const QUrl &file : qAsConst(files))
+            if ((fileName.isEmpty() || file.fileName().startsWith(fileName)) && !helpEngine->fileData(file).isEmpty())
+                return file;
+    }
+
+    return QUrl();
 }
 
 
