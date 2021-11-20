@@ -22,41 +22,37 @@ public:
     void setCollectionFile(const QString &collectionFile);
     inline QString collectionFile() const                   { return m_collectionFile; }
 
-    void setHomeSource(const QString &source);
-    inline QString homeSource() const                       { return m_homeSource; }
+    void setHomeSource(const QUrl &source);
+    inline QUrl homeSource() const                          { return m_homeSource; }
 
     void setOpenExternalLinksEnabled(const bool enabled);
-    inline bool openExternalLinks() const                   { return m_openExternalLinks; }
+    inline bool openExternalLinksEnabled() const            { return m_openExternalLinksEnabled; }
 
-    bool show(const QString &source = QString());
+    bool open(const QUrl &source = QUrl());
     void close();
 
-protected:
-    virtual bool event(QEvent *event) override;
-
 private:
+    QHelpEngine *m_helpEngine = nullptr;
+    QString m_collectionFile;
+    bool m_collectionFileChanged = false;
+
     QWidget *m_basisWidget;
 
-    QHelpEngine *m_helpEngine = nullptr;
     HelpWindow *m_helpWindow = nullptr;
-
     Qt::WindowStates m_helpWindowStates;
     QString m_helpWindowTitle;
     QPoint m_helpWindowPosition;
     QSize m_helpWindowSize = QSize(960, 600);
-    QList<int> m_horizontalSplitterSizes = { 200, 600 };
+    QList<int> m_helpWindowHorizontalSplitterSizes = { 200, 600 };
 
-    QString m_collectionFile;
-    bool m_collectionFileChanged = false;
+    QUrl m_lastValidSource;
+    QUrl m_homeSource;
 
-    QString m_lastValidSource;
-    QString m_homeSource;
-    QString m_source;
-
-    bool m_openExternalLinks = true;
+    bool m_openExternalLinksEnabled = true;
 
 private:
-    bool check(const QString &source);
+    bool check(const QUrl &source);
+    void _open(const QUrl &source);
 };
 
 #endif // HELPVIEWER_H

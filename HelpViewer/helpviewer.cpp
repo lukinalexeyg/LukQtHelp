@@ -15,8 +15,8 @@ HelpViewer::HelpViewer(QWidget *parent) :
 
 HelpViewer::HelpViewer(const QString &collectionFile, QWidget *parent) :
     QObject(parent),
-    m_basisWidget(parent),
-    m_collectionFile(collectionFile)
+    m_collectionFile(collectionFile),
+    m_basisWidget(parent)
 {
 }
 
@@ -25,15 +25,6 @@ HelpViewer::HelpViewer(const QString &collectionFile, QWidget *parent) :
 HelpViewer::~HelpViewer()
 {
     close();
-}
-
-
-
-void HelpViewer::setWindowTitle(const QString &title)
-{
-    m_helpWindowTitle = title;
-    if (m_helpWindow != nullptr)
-        m_helpWindow->setWindowTitle(m_helpWindowTitle);
 }
 
 
@@ -48,35 +39,42 @@ void HelpViewer::setCollectionFile(const QString &collectionFile)
 
 
 
-void HelpViewer::setHomeSource(const QString &source)
+void HelpViewer::setWindowTitle(const QString &title)
+{
+    m_helpWindowTitle = title;
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setWindowTitle(title);
+}
+
+
+
+void HelpViewer::setHomeSource(const QUrl &source)
 {
     m_homeSource = source;
     if (m_helpWindow != nullptr)
-        m_helpWindow->setHomeSource(m_homeSource);
+        m_helpWindow->setHomeSource(source);
 }
 
 
 
 void HelpViewer::setOpenExternalLinksEnabled(const bool enabled)
 {
-    m_openExternalLinks = enabled;
+    m_openExternalLinksEnabled = enabled;
     if (m_helpWindow != nullptr)
-        m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinks);
+        m_helpWindow->setOpenExternalLinksEnabled(enabled);
 }
 
 
 
-bool HelpViewer::show(const QString &source)
+bool HelpViewer::open(const QUrl &source)
 {
-    if (!source.startsWith(QStringLiteral("http"))) {
+    if (!HelpTextBrowser::isUrlHttp(source)) {
         if (check(source)) {
-            m_source = source;
-            moveToThread(QApplication::instance()->thread());
-            QCoreApplication::postEvent(this, new QEvent(QEvent::User));
+            _open(source);
             return true;
         }
     }
-    else if (m_openExternalLinks)
+    else if (m_openExternalLinksEnabled)
         return QDesktopServices::openUrl(source);
 
     return false;
@@ -84,55 +82,7 @@ bool HelpViewer::show(const QString &source)
 
 
 
-bool HelpViewer::event(QEvent *event)
-{
-    if (event->type() == QEvent::User) {
-
-        if (m_helpWindow == nullptr) {
-            m_helpWindow = new HelpWindow(m_helpEngine);
-            m_helpWindow->setWindowState(m_helpWindowStates);
-            m_helpWindow->setWindowTitle(m_helpWindowTitle);
-
-            if (!m_helpWindowPosition.isNull()) {
-                m_helpWindow->move(m_helpWindowPosition);
-                m_helpWindow->setSize(m_helpWindowSize);
-            }
-            else
-                m_helpWindow->setSize(m_helpWindowSize, m_basisWidget);
-
-            m_helpWindow->setHorizontalSplitterSizes(m_horizontalSplitterSizes);
-            m_helpWindow->setSource(m_lastValidSource);
-            m_helpWindow->setHomeSource(m_homeSource);
-            m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinks);
-
-            connect(m_helpWindow, &HelpWindow::destroyed, this, [this] {
-                m_helpWindowStates = m_helpWindow->windowState();
-                m_helpWindowPosition = m_helpWindow->pos();
-                m_helpWindowSize = m_helpWindow->size();
-                m_horizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
-                m_lastValidSource = m_helpWindow->lastSource().toString();
-                m_helpWindow = nullptr;
-                m_helpEngine->deleteLater();
-                m_helpEngine = nullptr;
-            });
-
-            m_helpWindow->show();
-        }
-
-        else {
-            m_helpWindow->setSource(m_source);
-            m_helpWindow->activateWindow();
-        }
-
-        return true;
-    }
-
-    return QObject::event(event);
-}
-
-
-
-bool HelpViewer::check(const QString &source)
+bool HelpViewer::check(const QUrl &source)
 {
     if (m_collectionFile.isEmpty())
         return false;
@@ -150,7 +100,7 @@ bool HelpViewer::check(const QString &source)
 
     if (sucessful) {
         if (!source.isEmpty()) {
-            if (!checkHelpEngine->fileData(QUrl(source)).isEmpty())
+            if (!checkHelpEngine->fileData(source).isEmpty())
                 m_lastValidSource = source;
             else
                 sucessful = false;
@@ -204,6 +154,47 @@ bool HelpViewer::check(const QString &source)
     }
 
     return sucessful;
+}
+
+
+
+void HelpViewer::_open(const QUrl &source)
+{
+    if (m_helpWindow == nullptr) {
+        m_helpWindow = new HelpWindow(m_helpEngine);
+        m_helpWindow->setWindowState(m_helpWindowStates);
+        m_helpWindow->setWindowTitle(m_helpWindowTitle);
+
+        if (!m_helpWindowPosition.isNull()) {
+            m_helpWindow->move(m_helpWindowPosition);
+            m_helpWindow->setSize(m_helpWindowSize);
+        }
+        else
+            m_helpWindow->setSize(m_helpWindowSize, m_basisWidget);
+
+        m_helpWindow->setHorizontalSplitterSizes(m_helpWindowHorizontalSplitterSizes);
+        m_helpWindow->setSource(m_lastValidSource);
+        m_helpWindow->setHomeSource(m_homeSource);
+        m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinksEnabled);
+
+        connect(m_helpWindow, &HelpWindow::destroyed, this, [this] {
+            m_helpWindowStates = m_helpWindow->windowState();
+            m_helpWindowPosition = m_helpWindow->pos();
+            m_helpWindowSize = m_helpWindow->size();
+            m_helpWindowHorizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
+            m_lastValidSource = m_helpWindow->lastSource().toString();
+            m_helpWindow = nullptr;
+            m_helpEngine->deleteLater();
+            m_helpEngine = nullptr;
+        });
+
+        m_helpWindow->show();
+    }
+
+    else {
+        m_helpWindow->setSource(source);
+        m_helpWindow->activateWindow();
+    }
 }
 
 

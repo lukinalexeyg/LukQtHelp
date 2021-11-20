@@ -14,7 +14,7 @@ HelpTextBrowser::HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent) :
 
 void HelpTextBrowser::setSource(const QUrl &url)
 {
-    if (!url.toString().startsWith(QStringLiteral("http")))
+    if (!isUrlHttp(url))
         QTextBrowser::setSource(url);
 
     else if (m_openExternalLinksEnabled)
@@ -25,7 +25,7 @@ void HelpTextBrowser::setSource(const QUrl &url)
 
 QVariant HelpTextBrowser::loadResource(const int type, const QUrl &name)
 {
-    if (name.scheme() == QStringLiteral("qthelp"))
+    if (isUrlHelp(name))
         return m_helpEngine->fileData(name);
 
     return QTextBrowser::loadResource(type, name);
@@ -37,4 +37,18 @@ void HelpTextBrowser::wheelEvent(QWheelEvent *event)
 {
     if (!event->modifiers().testFlag(Qt::ControlModifier))
         QTextBrowser::wheelEvent(event);
+}
+
+
+
+bool HelpTextBrowser::isUrlHttp(const QUrl &url)
+{
+    return url.scheme().startsWith(QStringLiteral("http"));
+}
+
+
+
+bool HelpTextBrowser::isUrlHelp(const QUrl &url)
+{
+    return url.scheme() == QStringLiteral("qthelp");
 }

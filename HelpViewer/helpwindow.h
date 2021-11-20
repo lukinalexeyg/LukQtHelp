@@ -18,7 +18,7 @@ public:
     QUrl lastSource() const;
 
     inline void setOpenExternalLinksEnabled(const bool enabled)     { m_helpTextBrowser->setOpenExternalLinksEnabled(enabled); }
-    inline bool openExternalLinks() const                           { return m_helpTextBrowser->openExternalLinksEnabled(); }
+    inline bool openExternalLinksEnabled() const                    { return m_helpTextBrowser->openExternalLinksEnabled(); }
 
     inline void setHorizontalSplitterSizes(const QList<int> &sizes) { m_horizontalSplitter->setSizes(sizes); }
     inline QList<int> horizontalSplitterSizes() const               { return m_horizontalSplitter->sizes(); }

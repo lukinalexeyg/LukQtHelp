@@ -15,6 +15,9 @@ public:
     inline void setOpenExternalLinksEnabled(const bool enabled) { m_openExternalLinksEnabled = enabled; }
     inline bool openExternalLinksEnabled() const                { return m_openExternalLinksEnabled; }
 
+    static bool isUrlHttp(const QUrl &url);
+    static bool isUrlHelp(const QUrl &url);
+
 protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 

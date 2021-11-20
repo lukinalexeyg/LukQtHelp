@@ -20,13 +20,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     m_helpViewer = new HelpViewer(qApp->applicationDirPath() + QStringLiteral("/ural_ru.qhc"), this);
     m_helpViewer->setWindowTitle(qApp->applicationName());
-    m_helpViewer->setHomeSource("qthelp://ural/doc/about.html");
+    m_helpViewer->setHomeSource(QStringLiteral("qthelp://ural/doc/about.html"));
 
     m_hBoxLayout = new QHBoxLayout;
 
-    addPushButton(QStringLiteral("Empty"), [this] { m_helpViewer->show(); });
-    addPushButton(QStringLiteral("Constructor"), [this] { m_helpViewer->show(QStringLiteral("qthelp://ural/doc/constructor.html")); });
-    addPushButton(QStringLiteral("Pattern"), [this] { m_helpViewer->show(QStringLiteral("qthelp://ural/doc/pattern.html")); });
+    addPushButton(QStringLiteral("Empty"), [this] { m_helpViewer->open(); });
+    addPushButton(QStringLiteral("Constructor"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/constructor.html")); });
+    addPushButton(QStringLiteral("Pattern"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/pattern.html")); });
 
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(m_hBoxLayout);
