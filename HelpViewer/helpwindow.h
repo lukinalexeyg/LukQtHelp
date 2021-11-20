@@ -25,16 +25,17 @@ public:
 
 private:
     QHelpEngine *m_helpEngine;
-    HelpTextBrowser *m_helpTextBrowser;
     QHelpContentModel *m_helpContentModel;
+    HelpTextBrowser *m_helpTextBrowser;
     QSplitter *m_horizontalSplitter;
-    QList<int> m_horizontalSplitterSizes = { 200, 600 };
+    QList<int> m_horizontalSplitterSizes;
     QStatusBar *m_statusBar;
     QUrl m_homeSource;
 
 private:
     void setToolBar();
-    void setContent();
+    void setWidgets();
+    void _setStatusBar();
     void showHideContents();
 };
 

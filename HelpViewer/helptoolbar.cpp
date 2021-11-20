@@ -5,9 +5,7 @@
 HelpToolBar::HelpToolBar(QWidget *parent) : QToolBar(parent)
 {
     setFloatable(false);
-    setMovable(false);
     setContextMenuPolicy(Qt::PreventContextMenu);
-//    setWindowTitle(tr("Toolbar"));
 
     setStyleSheet(QStringLiteral("QToolBar {padding: 5}"
                                  "QToolBar QToolButton {padding: 2; margin: 0}"));
@@ -62,8 +60,7 @@ void HelpToolBar::changeEvent(QEvent *event)
 
 void HelpToolBar::retranslate()
 {
-    setWindowTitle(tr("ToolBar"));
-    m_contentsAction->setText(tr("Show/hide content"));
+    m_contentsAction->setText(tr("Show/hide contents"));
     m_homeAction->setText(tr("Home"));
     m_backwardAction->setText(tr("Backward"));
     m_forwardAction->setText(tr("Forward"));

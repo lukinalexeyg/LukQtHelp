@@ -4,29 +4,23 @@
 #include <QGridLayout>
 #include <QHelpContentWidget>
 #include <QStatusBar>
-#include <QToolBar>
 
 
 
 HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     IndependentWindow(parent),
-    m_helpEngine(helpEngine)
+    m_helpEngine(helpEngine),
+    m_horizontalSplitterSizes{200, 600}
 {
     m_helpTextBrowser = new HelpTextBrowser(helpEngine, this);
     m_helpContentModel = helpEngine->contentModel();
 
     setToolBar();
-    setContent();
-
-    m_statusBar = new QStatusBar(this);
-    setStatusBar(m_statusBar);
+    setWidgets();
+    _setStatusBar();
 
     connect(helpEngine->contentWidget(), &QHelpContentWidget::pressed, this, [this](const QModelIndex &modelIndex) {
         m_helpTextBrowser->setSource(m_helpContentModel->contentItemAt(modelIndex)->url());
-    });
-
-    connect(m_helpTextBrowser, QOverload<const QUrl &>::of(&QTextBrowser::highlighted), this, [this](const QUrl &link) {
-        m_statusBar->showMessage(link.toString());
     });
 }
 
@@ -49,10 +43,7 @@ void HelpWindow::setHomeSource(const QUrl &source)
 
 QUrl HelpWindow::lastSource() const
 {
-    if (m_helpTextBrowser != nullptr)
-        return m_helpTextBrowser->historyUrl(0);
-
-    return QUrl();
+    return m_helpTextBrowser->historyUrl(0);
 }
 
 
@@ -79,7 +70,7 @@ void HelpWindow::setToolBar()
 
 
 
-void HelpWindow::setContent()
+void HelpWindow::setWidgets()
 {
     m_horizontalSplitter = new QSplitter(Qt::Horizontal);
     m_horizontalSplitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -103,6 +94,19 @@ void HelpWindow::setContent()
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(gridLayout);
     setCentralWidget(centralWidget);
+}
+
+
+
+void HelpWindow::_setStatusBar()
+{
+    m_statusBar = new QStatusBar(this);
+
+    connect(m_helpTextBrowser, QOverload<const QUrl &>::of(&QTextBrowser::highlighted), this, [this](const QUrl &link) {
+        m_statusBar->showMessage(link.toString());
+    });
+
+    setStatusBar(m_statusBar);
 }
 
 
