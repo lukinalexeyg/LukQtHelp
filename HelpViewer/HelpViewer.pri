@@ -5,6 +5,7 @@ DEPENDPATH += $$PWD
 QT += core gui help sql
 
 SOURCES += \
+    $$PWD/helpengine.cpp \
     $$PWD/helptextbrowser.cpp \
     $$PWD/helptoolbar.cpp \
     $$PWD/helpwindow.cpp \
@@ -12,6 +13,7 @@ SOURCES += \
     $$PWD/independentwindow.cpp
 
 HEADERS += \
+    $$PWD/helpengine.h \
     $$PWD/helptextbrowser.h \
     $$PWD/helptoolbar.h \
     $$PWD/helpwindow.h \

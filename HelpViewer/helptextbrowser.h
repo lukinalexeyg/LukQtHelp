@@ -2,7 +2,7 @@
 #define HELPTEXTBROWSER_H
 
 #include <QTextBrowser>
-#include <QtHelp/QHelpEngine>
+#include <QHelpEngine>
 #include <QWheelEvent>
 
 class HelpTextBrowser : public QTextBrowser

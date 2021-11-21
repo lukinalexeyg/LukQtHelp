@@ -91,36 +91,36 @@ bool HelpViewer::check(const QUrl &source)
     if (m_collectionFile.isEmpty())
         return false;
 
-    QHelpEngine *helpEngine;
+    HelpEngine *helpEngine;
     bool ok = true;
 
     if (m_helpEngine != nullptr && !m_collectionFileChanged)
         helpEngine = m_helpEngine;
     else {
-        helpEngine = new QHelpEngine(m_collectionFile, this);
+        helpEngine = new HelpEngine(m_collectionFile, this);
         if (!helpEngine->setupData())
             ok = false;
     }
 
     if (ok) {
         if (!source.isEmpty()) {
-            if (!helpEngine->fileData(source).isEmpty())
+            if (!helpEngine->isEmpty(source))
                 m_lastValidSource = source;
             else
                 ok = false;
         }
 
-        else if (!m_lastValidSource.isEmpty() && !helpEngine->fileData(m_lastValidSource).isEmpty()) {
+        else if (!m_lastValidSource.isEmpty() && !helpEngine->isEmpty(m_lastValidSource)) {
             // use m_lastValidSource
         }
 
-        else if (!m_homeSource.isEmpty() && !helpEngine->fileData(m_homeSource).isEmpty()) {
+        else if (!m_homeSource.isEmpty() && !helpEngine->isEmpty(m_homeSource)) {
             // use m_homeSource
             m_lastValidSource = m_homeSource;
         }
 
         else {
-            const QUrl file = findFile(helpEngine, QLatin1String("index"));
+            const QUrl file = helpEngine->fileUrl(QLatin1String("index"));
 
             if (file.isEmpty())
                 ok = false;
@@ -144,40 +144,6 @@ bool HelpViewer::check(const QUrl &source)
     }
 
     return ok;
-}
-
-
-
-QUrl HelpViewer::findFile(QHelpEngine *helpEngine, const QString &searchFileName) const
-{
-    const QStringList documentations = helpEngine->registeredDocumentations();
-    QUrl firstFile;
-
-    for (const QString &documentation : qAsConst(documentations)) {
-        const QList<QUrl> files = helpEngine->files(documentation, QString());
-
-        for (const QUrl &file : qAsConst(files)) {
-            const QString fileName = file.fileName();
-
-            if (!fileName.section(QLatin1Char('.'), -1).startsWith(QLatin1String("htm")))
-                continue;
-
-            if (firstFile.isEmpty() && !helpEngine->fileData(file).isEmpty()) {
-                if (fileName.startsWith(searchFileName))
-                    return file;
-                firstFile = file;
-            }
-
-            if (fileName.startsWith(searchFileName)) {
-                if (!helpEngine->fileData(file).isEmpty())
-                    return file;
-                if (!firstFile.isEmpty())
-                    return firstFile;
-            }
-        }
-    }
-
-    return firstFile;
 }
 
 

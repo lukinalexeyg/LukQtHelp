@@ -1,6 +1,7 @@
 #ifndef HELPVIEWER_H
 #define HELPVIEWER_H
 
+#include "helpengine.h"
 #include "helpwindow.h"
 
 class HelpViewer : public QObject
@@ -32,7 +33,7 @@ public:
     void close();
 
 private:
-    QHelpEngine *m_helpEngine = nullptr;
+    HelpEngine *m_helpEngine = nullptr;
     QString m_collectionFile;
     bool m_collectionFileChanged = false;
 
@@ -52,7 +53,6 @@ private:
 
 private:
     bool check(const QUrl &source);
-    QUrl findFile(QHelpEngine *helpEngine, const QString &searchFileName) const;
     void _open(const QUrl &source);
 };
 
