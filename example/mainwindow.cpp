@@ -2,14 +2,19 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QScreen>
 #include <QPushButton>
+#include <QScreen>
+#include <QStatusBar>
+
+static const QLatin1String s_collectionFile("Collection file: ");
+static const QLatin1String s_uralFile("ural_ru.qhc");
+static const QLatin1String s_invalidFile("invalid.qhc");
 
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    setFixedSize(420, 100);
+    setFixedSize(600, 120);
 
     QRect rect = geometry();
     const QList<QScreen*> screens = qApp->screens();
@@ -18,18 +23,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle(qApp->applicationName());
 
-    m_helpViewer = new HelpViewer(qApp->applicationDirPath() + QStringLiteral("/ural_ru.qhc"), this);
+    m_helpViewer = new HelpViewer(this);
     m_helpViewer->setWindowTitle(qApp->applicationName());
     m_helpViewer->setHomeSource(QStringLiteral("qthelp://ural/doc/about.html"));
 
-    m_hBoxLayout = new QHBoxLayout;
+    QHBoxLayout *hBoxLayout1 = new QHBoxLayout;
+    QHBoxLayout *hBoxLayout2 = new QHBoxLayout;
+    QVBoxLayout *vBoxLayout = new QVBoxLayout;
+    vBoxLayout->addLayout(hBoxLayout1);
+    vBoxLayout->addLayout(hBoxLayout2);
 
-    addPushButton(QStringLiteral("Empty"), [this] { m_helpViewer->open(); });
-    addPushButton(QStringLiteral("Constructor"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/constructor.html")); });
-    addPushButton(QStringLiteral("Pattern"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/pattern.html")); });
+    QStatusBar *statusBar = new QStatusBar(this);
+    setStatusBar(statusBar);
+    statusBar->showMessage(s_collectionFile);
+
+    addPushButton(hBoxLayout1, QString("Set %1 collection file").arg(s_uralFile), [this, statusBar] {
+        m_helpViewer->setCollectionFile(qApp->applicationDirPath() + QLatin1Char('/') + s_uralFile);
+        statusBar->showMessage(s_collectionFile + s_uralFile);
+    });
+
+    addPushButton(hBoxLayout1, QString("Set %1 collection file").arg(s_invalidFile), [this, statusBar] {
+        m_helpViewer->setCollectionFile(s_invalidFile);
+        statusBar->showMessage(s_collectionFile + s_invalidFile);
+    });
+
+    addPushButton(hBoxLayout2, QLatin1String("Empty"), [this] { m_helpViewer->open(); });
+    addPushButton(hBoxLayout2, QLatin1String("Constructor"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/constructor.html")); });
+    addPushButton(hBoxLayout2, QLatin1String("Pattern"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/pattern.html")); });
+    addPushButton(hBoxLayout2, QLatin1String("Error file"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/error.html")); });
 
     QWidget *centralWidget = new QWidget(this);
-    centralWidget->setLayout(m_hBoxLayout);
+    centralWidget->setLayout(vBoxLayout);
     setCentralWidget(centralWidget);
 }
 
@@ -43,14 +67,11 @@ void MainWindow::closeEvent(QCloseEvent*)
 
 
 template<typename Func>
-void MainWindow::addPushButton(const QString &name, Func slot)
+void MainWindow::addPushButton(QHBoxLayout *hBoxLayout, const QString &name, Func func)
 {
     QPushButton *pushButton = new QPushButton(name, this);
+    pushButton->setStyleSheet(QLatin1String("font-size: 12pt"));
+    connect(pushButton, &QPushButton::released, this, func);
 
-    pushButton->setFixedSize(120, 40);
-    pushButton->setStyleSheet(QStringLiteral("font-size: 12pt"));
-
-    m_hBoxLayout->addWidget(pushButton);
-
-    connect(pushButton, &QPushButton::released, this, slot);
+    hBoxLayout->addWidget(pushButton);
 }

@@ -17,10 +17,9 @@ public:
 
 private:
     HelpViewer *m_helpViewer;
-    QHBoxLayout *m_hBoxLayout;
 
     template<typename Func>
-    void addPushButton(const QString &name, Func slot);
+    void addPushButton(QHBoxLayout *hBoxLayout, const QString &name, Func func);
 };
 
 #endif // MAINWINDOW_H

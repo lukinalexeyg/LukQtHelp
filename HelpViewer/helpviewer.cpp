@@ -1,6 +1,5 @@
 #include "helpviewer.h"
 
-#include <QApplication>
 #include <QDesktopServices>
 
 
@@ -25,16 +24,6 @@ HelpViewer::HelpViewer(const QString &collectionFile, QWidget *parent) :
 HelpViewer::~HelpViewer()
 {
     close();
-}
-
-
-
-void HelpViewer::setCollectionFile(const QString &collectionFile)
-{
-    if (collectionFile != m_collectionFile) {
-        m_collectionFile = collectionFile;
-        m_collectionFileChanged = true;
-    }
 }
 
 
@@ -91,59 +80,49 @@ bool HelpViewer::check(const QUrl &url)
     if (m_collectionFile.isEmpty())
         return false;
 
-    HelpEngine *helpEngine = nullptr;
-    bool ok = true;
+    QSharedPointer<HelpEngine> helpEngine;
 
-    if (m_helpEngine != nullptr && !m_collectionFileChanged)
+    if (!m_helpEngine.isNull() && m_helpEngine->collectionFile() == m_collectionFile)
         helpEngine = m_helpEngine;
+
     else {
-        helpEngine = new HelpEngine(m_collectionFile, this);
+        helpEngine = QSharedPointer<HelpEngine>::create(m_collectionFile);
         if (!helpEngine->setupData())
-            ok = false;
+            return false;
+    }
+
+    bool ok = false;
+
+    if (!url.isEmpty()) {
+        if (!helpEngine->isEmpty(url)) {
+            m_lastValidUrl = url;
+            ok = true;
+        }
+    }
+
+    else if (!m_lastValidUrl.isEmpty() && !helpEngine->isEmpty(m_lastValidUrl))
+        ok = true;
+
+    else if (!m_homeUrl.isEmpty() && !helpEngine->isEmpty(m_homeUrl)) {
+        m_lastValidUrl = m_homeUrl;
+        ok = true;
+    }
+
+    else {
+        const QUrl fileUrl = helpEngine->fileUrl(QLatin1String("index"));
+        if (!fileUrl.isEmpty()) {
+            m_lastValidUrl = fileUrl;
+            ok = true;
+        }
     }
 
     if (ok) {
-        if (!url.isEmpty()) {
-            if (!helpEngine->isEmpty(url))
-                m_lastValidUrl = url;
-            else
-                ok = false;
-        }
-
-        else if (!m_lastValidUrl.isEmpty() && !helpEngine->isEmpty(m_lastValidUrl)) {
-            // use m_lastValidSource
-        }
-
-        else if (!m_homeUrl.isEmpty() && !helpEngine->isEmpty(m_homeUrl)) {
-            // use m_homeSource
-            m_lastValidUrl = m_homeUrl;
-        }
-
-        else {
-            const QUrl file = helpEngine->fileUrl(QLatin1String("index"));
-
-            if (file.isEmpty())
-                ok = false;
-            else {
-                m_lastValidUrl = file;
-                ok = true;
-            }
-        }
+        m_helpEngine = helpEngine;
+        m_helpEngine->setCollectionFile(m_collectionFile);
+        return true;
     }
 
-    if (m_helpEngine == nullptr) {
-        if (ok)
-            m_helpEngine = helpEngine;
-        else
-            helpEngine->deleteLater();
-    }
-    else if (m_collectionFileChanged) {
-        if (ok)
-            m_helpEngine->setCollectionFile(m_collectionFile);
-        helpEngine->deleteLater();
-    }
-
-    return ok;
+    return false;
 }
 
 
@@ -151,7 +130,7 @@ bool HelpViewer::check(const QUrl &url)
 void HelpViewer::_open(const QUrl &url)
 {
     if (m_helpWindow == nullptr) {
-        m_helpWindow = new HelpWindow(m_helpEngine);
+        m_helpWindow = new HelpWindow(m_helpEngine.data());
         m_helpWindow->setWindowState(m_helpWindowStates);
         m_helpWindow->setWindowTitle(m_helpWindowTitle);
 
@@ -174,8 +153,7 @@ void HelpViewer::_open(const QUrl &url)
             m_helpWindowHorizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
             m_lastValidUrl = m_helpWindow->lastSource().toString();
             m_helpWindow = nullptr;
-            m_helpEngine->deleteLater();
-            m_helpEngine = nullptr;
+            m_helpEngine = QSharedPointer<HelpEngine>(nullptr);
         });
 
         m_helpWindow->show();

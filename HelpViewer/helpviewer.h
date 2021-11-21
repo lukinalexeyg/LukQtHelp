@@ -14,28 +14,27 @@ public:
 
     ~HelpViewer();
 
-    inline void setBasisWidget(QWidget *widget = nullptr)   { m_basisWidget = widget; }
-    inline QWidget *basisWidget() const                     { return m_basisWidget; }
+    inline void setBasisWidget(QWidget *widget = nullptr)           { m_basisWidget = widget; }
+    inline QWidget *basisWidget() const                             { return m_basisWidget; }
 
     void setWindowTitle(const QString &title);
-    inline QString windowTitle() const                      { return m_helpWindowTitle; }
+    inline QString windowTitle() const                              { return m_helpWindowTitle; }
 
-    void setCollectionFile(const QString &collectionFile);
-    inline QString collectionFile() const                   { return m_collectionFile; }
+    inline void setCollectionFile(const QString &collectionFile)    { m_collectionFile = collectionFile; }
+    inline QString collectionFile() const                           { return m_collectionFile; }
 
     void setHomeSource(const QUrl &url);
-    inline QUrl homeSource() const                          { return m_homeUrl; }
+    inline QUrl homeSource() const                                  { return m_homeUrl; }
 
     void setOpenExternalLinksEnabled(const bool enabled);
-    inline bool openExternalLinksEnabled() const            { return m_openExternalLinksEnabled; }
+    inline bool openExternalLinksEnabled() const                    { return m_openExternalLinksEnabled; }
 
     bool open(const QUrl &url = QUrl());
     void close();
 
 private:
-    HelpEngine *m_helpEngine = nullptr;
+    QSharedPointer<HelpEngine> m_helpEngine;
     QString m_collectionFile;
-    bool m_collectionFileChanged = false;
 
     QWidget *m_basisWidget;
 
@@ -51,8 +50,8 @@ private:
     QUrl m_lastValidUrl;
 
 private:
-    bool check(const QUrl &source);
-    void _open(const QUrl &source);
+    bool check(const QUrl &url);
+    void _open(const QUrl &url);
 };
 
 #endif // HELPVIEWER_H
