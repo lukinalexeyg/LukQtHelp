@@ -92,22 +92,22 @@ bool HelpViewer::check(const QUrl &source)
         return false;
 
     QHelpEngine *helpEngine;
-    bool sucessful = true;
+    bool ok = true;
 
     if (m_helpEngine != nullptr && !m_collectionFileChanged)
         helpEngine = m_helpEngine;
     else {
         helpEngine = new QHelpEngine(m_collectionFile, this);
         if (!helpEngine->setupData())
-            sucessful = false;
+            ok = false;
     }
 
-    if (sucessful) {
+    if (ok) {
         if (!source.isEmpty()) {
             if (!helpEngine->fileData(source).isEmpty())
                 m_lastValidSource = source;
             else
-                sucessful = false;
+                ok = false;
         }
 
         else if (!m_lastValidSource.isEmpty() && !helpEngine->fileData(m_lastValidSource).isEmpty()) {
@@ -120,50 +120,64 @@ bool HelpViewer::check(const QUrl &source)
         }
 
         else {
-            const QStringList documentations = helpEngine->registeredDocumentations();
-
-            QUrl file = findFile(helpEngine, documentations, QStringLiteral("index.htm"));
-
-            if (!file.isEmpty())
-                file = findFile(helpEngine, documentations);
+            const QUrl file = findFile(helpEngine, QLatin1String("index"));
 
             if (file.isEmpty())
-                sucessful = false;
+                ok = false;
             else {
                 m_lastValidSource = file;
-                sucessful = true;
+                ok = true;
             }
         }
     }
 
     if (m_helpEngine == nullptr) {
-        if (sucessful)
+        if (ok)
             m_helpEngine = helpEngine;
         else
             helpEngine->deleteLater();
     }
     else if (m_collectionFileChanged) {
-        if (sucessful)
+        if (ok)
             m_helpEngine->setCollectionFile(m_collectionFile);
         helpEngine->deleteLater();
     }
 
-    return sucessful;
+    return ok;
 }
 
 
 
-QUrl HelpViewer::findFile(QHelpEngine *helpEngine, const QStringList &documentations, const QString &fileName) const
+QUrl HelpViewer::findFile(QHelpEngine *helpEngine, const QString &searchFileName) const
 {
-    for (const QString &documentation : qAsConst(documentations)) {
-        const QList<QUrl> files = helpEngine->files(documentation, QStringList());
+    const QStringList documentations = helpEngine->registeredDocumentations();
+    QUrl firstFile;
 
-        for (const QUrl &file : qAsConst(files))
-            if ((fileName.isEmpty() || file.fileName().startsWith(fileName)) && !helpEngine->fileData(file).isEmpty())
-                return file;
+    for (const QString &documentation : qAsConst(documentations)) {
+        const QList<QUrl> files = helpEngine->files(documentation, QString());
+
+        for (const QUrl &file : qAsConst(files)) {
+            const QString fileName = file.fileName();
+
+            if (!fileName.section(QLatin1Char('.'), -1).startsWith(QLatin1String("htm")))
+                continue;
+
+            if (firstFile.isEmpty() && !helpEngine->fileData(file).isEmpty()) {
+                if (fileName.startsWith(searchFileName))
+                    return file;
+                firstFile = file;
+            }
+
+            if (fileName.startsWith(searchFileName)) {
+                if (!helpEngine->fileData(file).isEmpty())
+                    return file;
+                if (!firstFile.isEmpty())
+                    return firstFile;
+            }
+        }
     }
 
-    return QUrl();
+    return firstFile;
 }
 
 

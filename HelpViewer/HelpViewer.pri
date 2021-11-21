@@ -11,7 +11,7 @@ SOURCES += \
     $$PWD/helpviewer.cpp \
     $$PWD/independentwindow.cpp
 
-HEADERS  += \
+HEADERS += \
     $$PWD/helptextbrowser.h \
     $$PWD/helptoolbar.h \
     $$PWD/helpwindow.h \

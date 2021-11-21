@@ -52,7 +52,7 @@ private:
 
 private:
     bool check(const QUrl &source);
-    QUrl findFile(QHelpEngine *helpEngine, const QStringList &documentations, const QString &fileName = QString()) const;
+    QUrl findFile(QHelpEngine *helpEngine, const QString &searchFileName) const;
     void _open(const QUrl &source);
 };
 
