@@ -23,13 +23,13 @@ public:
     void setCollectionFile(const QString &collectionFile);
     inline QString collectionFile() const                   { return m_collectionFile; }
 
-    void setHomeSource(const QUrl &source);
-    inline QUrl homeSource() const                          { return m_homeSource; }
+    void setHomeSource(const QUrl &url);
+    inline QUrl homeSource() const                          { return m_homeUrl; }
 
     void setOpenExternalLinksEnabled(const bool enabled);
     inline bool openExternalLinksEnabled() const            { return m_openExternalLinksEnabled; }
 
-    bool open(const QUrl &source = QUrl());
+    bool open(const QUrl &url = QUrl());
     void close();
 
 private:
@@ -45,11 +45,10 @@ private:
     QPoint m_helpWindowPosition;
     QSize m_helpWindowSize = QSize(960, 600);
     QList<int> m_helpWindowHorizontalSplitterSizes = { 200, 600 };
-
-    QUrl m_lastValidSource;
-    QUrl m_homeSource;
-
     bool m_openExternalLinksEnabled = true;
+
+    QUrl m_homeUrl;
+    QUrl m_lastValidUrl;
 
 private:
     bool check(const QUrl &source);

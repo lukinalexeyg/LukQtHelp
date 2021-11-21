@@ -21,7 +21,7 @@ QUrl HelpEngine::fileUrl(const QString &searchFileName)
     QUrl firstFileUrl;
 
     for (const QString &documentation : qAsConst(documentations)) {
-        const QList<QUrl> fileUrls = this->files(documentation, QString());
+        const QList<QUrl> fileUrls = files(documentation, QString());
 
         for (const QUrl &fileUrl : qAsConst(fileUrls)) {
             const QString fileName = fileUrl.fileName();

@@ -49,12 +49,12 @@ void HelpViewer::setWindowTitle(const QString &title)
 
 
 
-void HelpViewer::setHomeSource(const QUrl &source)
+void HelpViewer::setHomeSource(const QUrl &url)
 {
-    m_homeSource = source;
+    m_homeUrl = url;
 
     if (m_helpWindow != nullptr)
-        m_helpWindow->setHomeSource(source);
+        m_helpWindow->setHomeSource(url);
 }
 
 
@@ -69,29 +69,29 @@ void HelpViewer::setOpenExternalLinksEnabled(const bool enabled)
 
 
 
-bool HelpViewer::open(const QUrl &source)
+bool HelpViewer::open(const QUrl &url)
 {
-    if (!HelpTextBrowser::isUrlHttp(source)) {
-        if (check(source)) {
-            _open(source);
+    if (!HelpTextBrowser::isUrlHttp(url)) {
+        if (check(url)) {
+            _open(url);
             return true;
         }
     }
 
     else if (m_openExternalLinksEnabled)
-        return QDesktopServices::openUrl(source);
+        return QDesktopServices::openUrl(url);
 
     return false;
 }
 
 
 
-bool HelpViewer::check(const QUrl &source)
+bool HelpViewer::check(const QUrl &url)
 {
     if (m_collectionFile.isEmpty())
         return false;
 
-    HelpEngine *helpEngine;
+    HelpEngine *helpEngine = nullptr;
     bool ok = true;
 
     if (m_helpEngine != nullptr && !m_collectionFileChanged)
@@ -103,20 +103,20 @@ bool HelpViewer::check(const QUrl &source)
     }
 
     if (ok) {
-        if (!source.isEmpty()) {
-            if (!helpEngine->isEmpty(source))
-                m_lastValidSource = source;
+        if (!url.isEmpty()) {
+            if (!helpEngine->isEmpty(url))
+                m_lastValidUrl = url;
             else
                 ok = false;
         }
 
-        else if (!m_lastValidSource.isEmpty() && !helpEngine->isEmpty(m_lastValidSource)) {
+        else if (!m_lastValidUrl.isEmpty() && !helpEngine->isEmpty(m_lastValidUrl)) {
             // use m_lastValidSource
         }
 
-        else if (!m_homeSource.isEmpty() && !helpEngine->isEmpty(m_homeSource)) {
+        else if (!m_homeUrl.isEmpty() && !helpEngine->isEmpty(m_homeUrl)) {
             // use m_homeSource
-            m_lastValidSource = m_homeSource;
+            m_lastValidUrl = m_homeUrl;
         }
 
         else {
@@ -125,7 +125,7 @@ bool HelpViewer::check(const QUrl &source)
             if (file.isEmpty())
                 ok = false;
             else {
-                m_lastValidSource = file;
+                m_lastValidUrl = file;
                 ok = true;
             }
         }
@@ -148,7 +148,7 @@ bool HelpViewer::check(const QUrl &source)
 
 
 
-void HelpViewer::_open(const QUrl &source)
+void HelpViewer::_open(const QUrl &url)
 {
     if (m_helpWindow == nullptr) {
         m_helpWindow = new HelpWindow(m_helpEngine);
@@ -163,8 +163,8 @@ void HelpViewer::_open(const QUrl &source)
             m_helpWindow->setSize(m_helpWindowSize, m_basisWidget);
 
         m_helpWindow->setHorizontalSplitterSizes(m_helpWindowHorizontalSplitterSizes);
-        m_helpWindow->setSource(m_lastValidSource);
-        m_helpWindow->setHomeSource(m_homeSource);
+        m_helpWindow->setSource(m_lastValidUrl);
+        m_helpWindow->setHomeSource(m_homeUrl);
         m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinksEnabled);
 
         connect(m_helpWindow, &HelpWindow::destroyed, this, [this] {
@@ -172,7 +172,7 @@ void HelpViewer::_open(const QUrl &source)
             m_helpWindowPosition = m_helpWindow->pos();
             m_helpWindowSize = m_helpWindow->size();
             m_helpWindowHorizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
-            m_lastValidSource = m_helpWindow->lastSource().toString();
+            m_lastValidUrl = m_helpWindow->lastSource().toString();
             m_helpWindow = nullptr;
             m_helpEngine->deleteLater();
             m_helpEngine = nullptr;
@@ -182,7 +182,7 @@ void HelpViewer::_open(const QUrl &source)
     }
 
     else {
-        m_helpWindow->setSource(source);
+        m_helpWindow->setSource(url);
         m_helpWindow->activateWindow();
     }
 }
