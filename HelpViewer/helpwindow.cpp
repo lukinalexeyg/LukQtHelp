@@ -13,14 +13,13 @@ HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     m_splitterSizes{200, 600}
 {
     m_helpTextBrowser = new HelpTextBrowser(helpEngine, this);
-    m_helpContentModel = helpEngine->contentModel();
 
     setToolBar();
     setWidgets();
     _setStatusBar();
 
     connect(helpEngine->contentWidget(), &QHelpContentWidget::pressed, this, [this](const QModelIndex &modelIndex) {
-        m_helpTextBrowser->setSource(m_helpContentModel->contentItemAt(modelIndex)->url());
+        m_helpTextBrowser->setSource(m_helpEngine->contentModel()->contentItemAt(modelIndex)->url());
     });
 }
 
@@ -35,8 +34,7 @@ void HelpWindow::setSource(const QUrl &source)
 
 void HelpWindow::setHomeSource(const QUrl &source)
 {
-    if (!m_helpEngine->fileData(source).isEmpty())
-        m_homeSource = source;
+    m_homeSource = source;
 }
 
 

@@ -25,7 +25,6 @@ public:
 
 private:
     QHelpEngine *m_helpEngine;
-    QHelpContentModel *m_helpContentModel;
     HelpTextBrowser *m_helpTextBrowser;
     QSplitter *m_splitter;
     QList<int> m_splitterSizes;

@@ -15,21 +15,13 @@ IndependentWindow::IndependentWindow(QWidget *parent) : QMainWindow(parent)
 
 void IndependentWindow::setSize(const QSize &size, QWidget *basisWidget)
 {
+    QSize s = size;
     const QList<QScreen*> screens = qApp->screens();
     const QRect screenRect = screens.first()->geometry();
-    QSize s = size;
-
     const int titleBarHeight = qApp->style()->pixelMetric(QStyle::PM_TitleBarHeight);
 
-    if (s.width() < 0)
-        s.setWidth(0);
-    else if (s.width() > screenRect.width())
-        s.setWidth(screenRect.width());
-
-    if (s.height() < 0)
-        s.setHeight(0);
-    else if (s.height() > screenRect.height() - titleBarHeight)
-        s.setHeight(screenRect.height() - titleBarHeight);
+    s.setWidth(qBound(0, s.width(), screenRect.width()));
+    s.setHeight(qBound(0, s.height(), screenRect.height() - titleBarHeight));
 
     if (basisWidget != nullptr) {
         int x = basisWidget->x() + (basisWidget->width() - s.width()) / 2;

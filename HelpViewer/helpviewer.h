@@ -57,7 +57,7 @@ private:
     Qt::WindowStates m_windowState;
     QString m_windowTitle;
     QPoint m_windowPosition;
-    bool m_windowPositionIsUndefined = true;
+    bool m_isWindowPositionDefined = false;
     QSize m_windowSize = QSize(960, 600);
     QList<int> m_windowSplitterSizes = { 200, 600 };
 

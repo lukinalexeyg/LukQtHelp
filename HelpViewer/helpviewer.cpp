@@ -32,7 +32,7 @@ void HelpViewer::setHomeSource(const QUrl &url)
 {
     m_homeUrl = url;
 
-    if (m_helpWindow != nullptr)
+    if (m_helpWindow != nullptr && !m_helpEngine->isEmpty(url))
         m_helpWindow->setHomeSource(url);
 }
 
@@ -71,7 +71,7 @@ void HelpViewer::setWindowTitle(const QString &title)
 void HelpViewer::setWindowPosition(const QPoint &position)
 {
     m_windowPosition = position;
-    m_windowPositionIsUndefined = false;
+    m_isWindowPositionDefined = true;
 
     if (m_helpWindow != nullptr)
         m_helpWindow->move(position);
@@ -87,7 +87,7 @@ void HelpViewer::setWindowSize(const QSize &size)
     m_windowSize = size;
 
     if (m_helpWindow != nullptr)
-        m_helpWindow->setSize(m_windowSize, m_basisWidget);
+        m_helpWindow->setSize(m_windowSize, m_isWindowPositionDefined ? nullptr : m_basisWidget);
 }
 
 
@@ -180,20 +180,21 @@ void HelpViewer::_open(const QUrl &url)
         m_helpWindow = new HelpWindow(m_helpEngine.data());
 
         m_helpWindow->setSource(m_lastValidUrl);
-        m_helpWindow->setHomeSource(m_homeUrl);
+
+        if (!m_helpEngine->isEmpty(m_homeUrl))
+            m_helpWindow->setHomeSource(m_homeUrl);
+
         m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinksEnabled);
 
         m_helpWindow->setWindowState(m_windowState);
         m_helpWindow->setWindowTitle(m_windowTitle);
 
-        if (m_windowPositionIsUndefined) {
-            m_windowPositionIsUndefined = false;
-            m_helpWindow->setSize(m_windowSize, m_basisWidget);
-        }
-        else {
+        if (m_isWindowPositionDefined) {
             m_helpWindow->move(m_windowPosition);
             m_helpWindow->setSize(m_windowSize);
         }
+        else
+            m_helpWindow->setSize(m_windowSize, m_basisWidget);
 
         m_helpWindow->setSplitterSizes(m_windowSplitterSizes);
 
@@ -215,6 +216,7 @@ void HelpViewer::onWindowDestroyed()
     m_lastValidUrl = m_helpWindow->lastSource();
     m_windowState = m_helpWindow->windowState();
     m_windowPosition = m_helpWindow->pos();
+    m_isWindowPositionDefined = true;
     m_windowSize = m_helpWindow->size();
     m_windowSplitterSizes = m_helpWindow->splitterSizes();
     m_helpWindow = nullptr;
