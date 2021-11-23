@@ -18,9 +18,7 @@ HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     setWidgets();
     _setStatusBar();
 
-    connect(helpEngine->contentWidget(), &QHelpContentWidget::pressed, this, [this](const QModelIndex &modelIndex) {
-        m_helpTextBrowser->setSource(m_helpEngine->contentModel()->contentItemAt(modelIndex)->url());
-    });
+    connect(helpEngine->contentWidget(), &QHelpContentWidget::pressed, this, &HelpWindow::onContentWidgetPressed);
 }
 
 
@@ -32,16 +30,37 @@ void HelpWindow::setSource(const QUrl &source)
 
 
 
-void HelpWindow::setHomeSource(const QUrl &source)
+QUrl HelpWindow::lastSource() const
 {
-    m_homeSource = source;
+    return m_helpTextBrowser->historyUrl(0);
 }
 
 
 
-QUrl HelpWindow::lastSource() const
+void HelpWindow::setOpenExternalLinksEnabled(const bool enabled)
 {
-    return m_helpTextBrowser->historyUrl(0);
+    m_helpTextBrowser->setOpenExternalLinksEnabled(enabled);
+}
+
+
+
+bool HelpWindow::openExternalLinksEnabled() const
+{
+    return m_helpTextBrowser->openExternalLinksEnabled();
+}
+
+
+
+void HelpWindow::setSplitterSizes(const QList<int> &sizes)
+{
+    m_splitter->setSizes(sizes);
+}
+
+
+
+QList<int> HelpWindow::splitterSizes() const
+{
+    return m_splitter->sizes();
 }
 
 
@@ -51,12 +70,7 @@ void HelpWindow::setToolBar()
     HelpToolBar *helpToolBar = new HelpToolBar(this);
 
     connect(helpToolBar, &HelpToolBar::contentsTriggered, this, &HelpWindow::showHideContents);
-    connect(helpToolBar, &HelpToolBar::homeTriggered, this, [this]() {
-        if (m_homeSource.isEmpty())
-            m_helpTextBrowser->home();
-        else
-            m_helpTextBrowser->setSource(m_homeSource);
-    });
+    connect(helpToolBar, &HelpToolBar::homeTriggered, this, &HelpWindow::onToolBarHomeTriggered);
     connect(helpToolBar, &HelpToolBar::backwardTriggered, m_helpTextBrowser, &HelpTextBrowser::backward);
     connect(helpToolBar, &HelpToolBar::forwardTriggered, m_helpTextBrowser, &HelpTextBrowser::forward);
 
@@ -100,9 +114,7 @@ void HelpWindow::_setStatusBar()
 {
     m_statusBar = new QStatusBar(this);
 
-    connect(m_helpTextBrowser, QOverload<const QUrl &>::of(&QTextBrowser::highlighted), this, [this](const QUrl &link) {
-        m_statusBar->showMessage(link.toString());
-    });
+    connect(m_helpTextBrowser, QOverload<const QUrl &>::of(&QTextBrowser::highlighted), this, &HelpWindow::onTextBrowserHighlighted);
 
     setStatusBar(m_statusBar);
 }
@@ -119,4 +131,28 @@ void HelpWindow::showHideContents()
     }
     else
         m_splitter->setSizes(m_splitterSizes);
+}
+
+
+
+void HelpWindow::onContentWidgetPressed(const QModelIndex &modelIndex)
+{
+    m_helpTextBrowser->setSource(m_helpEngine->contentModel()->contentItemAt(modelIndex)->url());
+}
+
+
+
+void HelpWindow::onToolBarHomeTriggered()
+{
+    if (m_homeSource.isEmpty())
+        m_helpTextBrowser->home();
+    else
+        m_helpTextBrowser->setSource(m_homeSource);
+}
+
+
+
+void HelpWindow::onTextBrowserHighlighted(const QUrl &link)
+{
+    m_statusBar->showMessage(link.toString());
 }

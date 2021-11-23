@@ -12,8 +12,8 @@ public:
 
     virtual void setSource(const QUrl &url) override;
 
-    inline void setOpenExternalLinksEnabled(const bool enabled) { m_openExternalLinksEnabled = enabled; }
-    inline bool openExternalLinksEnabled() const                { return m_openExternalLinksEnabled; }
+    void setOpenExternalLinksEnabled(const bool enabled)    { m_openExternalLinksEnabled = enabled; }
+    bool openExternalLinksEnabled() const                   { return m_openExternalLinksEnabled; }
 
     static bool isUrlHttp(const QUrl &url);
     static bool isUrlHelp(const QUrl &url);
