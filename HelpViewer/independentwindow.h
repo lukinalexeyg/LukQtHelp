@@ -11,7 +11,7 @@ class IndependentWindow : public QMainWindow
 public:
     explicit IndependentWindow(QWidget *parent = nullptr);
 
-    void setSize(QSize size, QWidget *basisWidget = nullptr);
+    void setSize(const QSize &size, QWidget *basisWidget = nullptr);
 
 signals:
     void closed();

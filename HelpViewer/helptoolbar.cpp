@@ -11,7 +11,7 @@ HelpToolBar::HelpToolBar(QWidget *parent) : QToolBar(parent)
                                  "QToolBar QToolButton {padding: 2; margin: 0}"));
 
     m_contentsAction = addAction(QIcon(QStringLiteral(":/images/icon-menu.svg")), QString(),
-                                         this, &HelpToolBar::contentsTriggered);
+                                 this, &HelpToolBar::contentsTriggered);
 
     addSeparator();
 

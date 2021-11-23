@@ -10,7 +10,7 @@
 HelpWindow::HelpWindow(QHelpEngine *helpEngine, QWidget *parent) :
     IndependentWindow(parent),
     m_helpEngine(helpEngine),
-    m_horizontalSplitterSizes{200, 600}
+    m_splitterSizes{200, 600}
 {
     m_helpTextBrowser = new HelpTextBrowser(helpEngine, this);
     m_helpContentModel = helpEngine->contentModel();
@@ -72,24 +72,24 @@ void HelpWindow::setToolBar()
 
 void HelpWindow::setWidgets()
 {
-    m_horizontalSplitter = new QSplitter(Qt::Horizontal);
-    m_horizontalSplitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_splitter = new QSplitter(Qt::Horizontal);
+    m_splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_horizontalSplitter->addWidget(m_helpEngine->contentWidget());
-    m_horizontalSplitter->addWidget(m_helpTextBrowser);
+    m_splitter->addWidget(m_helpEngine->contentWidget());
+    m_splitter->addWidget(m_helpTextBrowser);
 
-    m_horizontalSplitter->setStretchFactor(0, 0);
-    m_horizontalSplitter->setStretchFactor(1, 1);
+    m_splitter->setStretchFactor(0, 0);
+    m_splitter->setStretchFactor(1, 1);
 
-    m_horizontalSplitter->setCollapsible(0, true);
-    m_horizontalSplitter->setCollapsible(1, false);
+    m_splitter->setCollapsible(0, true);
+    m_splitter->setCollapsible(1, false);
 
-    m_horizontalSplitter->setSizes(m_horizontalSplitterSizes);
+    m_splitter->setSizes(m_splitterSizes);
 
     QGridLayout *gridLayout = new QGridLayout;
     gridLayout->setAlignment(Qt::AlignCenter);
     gridLayout->setContentsMargins(5, 5, 5, 0);
-    gridLayout->addWidget(m_horizontalSplitter, 0, 0);
+    gridLayout->addWidget(m_splitter, 0, 0);
 
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(gridLayout);
@@ -114,11 +114,11 @@ void HelpWindow::_setStatusBar()
 void HelpWindow::showHideContents()
 {
     if (m_helpEngine->contentWidget()->width() > 0) {
-        m_horizontalSplitterSizes = m_horizontalSplitter->sizes();
+        m_splitterSizes = m_splitter->sizes();
         QList<int> newHorizontalSizes;
         newHorizontalSizes << 0 << 800;
-        m_horizontalSplitter->setSizes(newHorizontalSizes);
+        m_splitter->setSizes(newHorizontalSizes);
     }
     else
-        m_horizontalSplitter->setSizes(m_horizontalSplitterSizes);
+        m_splitter->setSizes(m_splitterSizes);
 }

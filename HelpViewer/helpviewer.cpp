@@ -28,16 +28,6 @@ HelpViewer::~HelpViewer()
 
 
 
-void HelpViewer::setWindowTitle(const QString &title)
-{
-    m_helpWindowTitle = title;
-
-    if (m_helpWindow != nullptr)
-        m_helpWindow->setWindowTitle(title);
-}
-
-
-
 void HelpViewer::setHomeSource(const QUrl &url)
 {
     m_homeUrl = url;
@@ -54,6 +44,63 @@ void HelpViewer::setOpenExternalLinksEnabled(const bool enabled)
 
     if (m_helpWindow != nullptr)
         m_helpWindow->setOpenExternalLinksEnabled(enabled);
+}
+
+
+
+void HelpViewer::setWindowState(const Qt::WindowStates states)
+{
+    m_windowState = states;
+
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setWindowState(states);
+}
+
+
+
+void HelpViewer::setWindowTitle(const QString &title)
+{
+    m_windowTitle = title;
+
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setWindowTitle(title);
+}
+
+
+
+void HelpViewer::setWindowPosition(const QPoint &position)
+{
+    m_windowPosition = position;
+    m_windowPositionIsUndefined = false;
+
+    if (m_helpWindow != nullptr)
+        m_helpWindow->move(position);
+}
+
+
+
+void HelpViewer::setWindowSize(const QSize &size)
+{
+    if (size.isNull())
+        return;
+
+    m_windowSize = size;
+
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setSize(m_windowSize, m_basisWidget);
+}
+
+
+
+void HelpViewer::setWindowSplitterSizes(const QList<int> &sizes)
+{
+    if (sizes.count() != 2)
+        return;
+
+    m_windowSplitterSizes = sizes;
+
+    if (m_helpWindow != nullptr)
+        m_helpWindow->setSplitterSizes(sizes);
 }
 
 
@@ -131,30 +178,26 @@ void HelpViewer::_open(const QUrl &url)
 {
     if (m_helpWindow == nullptr) {
         m_helpWindow = new HelpWindow(m_helpEngine.data());
-        m_helpWindow->setWindowState(m_helpWindowStates);
-        m_helpWindow->setWindowTitle(m_helpWindowTitle);
 
-        if (!m_helpWindowPosition.isNull()) {
-            m_helpWindow->move(m_helpWindowPosition);
-            m_helpWindow->setSize(m_helpWindowSize);
-        }
-        else
-            m_helpWindow->setSize(m_helpWindowSize, m_basisWidget);
-
-        m_helpWindow->setHorizontalSplitterSizes(m_helpWindowHorizontalSplitterSizes);
         m_helpWindow->setSource(m_lastValidUrl);
         m_helpWindow->setHomeSource(m_homeUrl);
         m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinksEnabled);
 
-        connect(m_helpWindow, &HelpWindow::destroyed, this, [this] {
-            m_helpWindowStates = m_helpWindow->windowState();
-            m_helpWindowPosition = m_helpWindow->pos();
-            m_helpWindowSize = m_helpWindow->size();
-            m_helpWindowHorizontalSplitterSizes = m_helpWindow->horizontalSplitterSizes();
-            m_lastValidUrl = m_helpWindow->lastSource().toString();
-            m_helpWindow = nullptr;
-            m_helpEngine = QSharedPointer<HelpEngine>(nullptr);
-        });
+        m_helpWindow->setWindowState(m_windowState);
+        m_helpWindow->setWindowTitle(m_windowTitle);
+
+        if (m_windowPositionIsUndefined) {
+            m_windowPositionIsUndefined = false;
+            m_helpWindow->setSize(m_windowSize, m_basisWidget);
+        }
+        else {
+            m_helpWindow->move(m_windowPosition);
+            m_helpWindow->setSize(m_windowSize);
+        }
+
+        m_helpWindow->setSplitterSizes(m_windowSplitterSizes);
+
+        connect(m_helpWindow, &HelpWindow::destroyed, this, &HelpViewer::onWindowDestroyed);
 
         m_helpWindow->show();
     }
@@ -163,6 +206,19 @@ void HelpViewer::_open(const QUrl &url)
         m_helpWindow->setSource(url);
         m_helpWindow->activateWindow();
     }
+}
+
+
+
+void HelpViewer::onWindowDestroyed()
+{
+    m_lastValidUrl = m_helpWindow->lastSource();
+    m_windowState = m_helpWindow->windowState();
+    m_windowPosition = m_helpWindow->pos();
+    m_windowSize = m_helpWindow->size();
+    m_windowSplitterSizes = m_helpWindow->splitterSizes();
+    m_helpWindow = nullptr;
+    m_helpEngine = QSharedPointer<HelpEngine>(nullptr);
 }
 
 
