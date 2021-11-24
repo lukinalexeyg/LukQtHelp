@@ -137,7 +137,8 @@ void HelpWindow::showHideContents()
 
 void HelpWindow::onContentWidgetPressed(const QModelIndex &modelIndex)
 {
-    m_helpTextBrowser->setSource(m_helpEngine->contentModel()->contentItemAt(modelIndex)->url());
+    const QUrl url = m_helpEngine->contentModel()->contentItemAt(modelIndex)->url();
+    m_helpTextBrowser->setSource(url);
 }
 
 

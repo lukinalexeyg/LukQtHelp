@@ -49,5 +49,5 @@ void IndependentWindow::closeEvent(QCloseEvent *event)
 {
     emit closed();
     event->accept();
-    delete this;
+    delete this; // do not use deleteLater() here
 }

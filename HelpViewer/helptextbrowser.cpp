@@ -43,12 +43,12 @@ void HelpTextBrowser::wheelEvent(QWheelEvent *event)
 
 bool HelpTextBrowser::isUrlHttp(const QUrl &url)
 {
-    return url.scheme().startsWith(QStringLiteral("http"));
+    return url.scheme().startsWith(QLatin1String("http"));
 }
 
 
 
 bool HelpTextBrowser::isUrlHelp(const QUrl &url)
 {
-    return url.scheme() == QStringLiteral("qthelp");
+    return url.scheme() == QLatin1String("qthelp");
 }

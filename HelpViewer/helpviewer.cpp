@@ -156,7 +156,7 @@ bool HelpViewer::check(const QUrl &url)
     }
 
     else {
-        const QUrl fileUrl = helpEngine->fileUrl(QLatin1String("index"));
+        const QUrl fileUrl = helpEngine->fileUrl(QStringLiteral("index"));
         if (!fileUrl.isEmpty()) {
             m_lastValidUrl = fileUrl;
             ok = true;
