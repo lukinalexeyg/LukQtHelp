@@ -9,6 +9,18 @@ class HelpViewer : public QObject
     Q_OBJECT
 
 public:
+    enum Error {
+        NoError,
+        CollectionFileIsUndefined,
+        CollectionFileNotFound,
+        CollectionFileSetupError,
+        DataFileIsEmpty,
+        ExternalLinksAreDisabled,
+        ExternalLinkOpenError,
+        InvalidSheme
+    };
+
+public:
     explicit HelpViewer(QWidget *parent = nullptr);
     explicit HelpViewer(const QString &collectionFile, QWidget *parent = nullptr);
 
@@ -44,6 +56,8 @@ public:
     bool open(const QUrl &url = QUrl());
     void close();
 
+    Error lastError() const                                 { return m_lastError; }
+
 private:
     QSharedPointer<HelpEngine> m_helpEngine;
     QString m_collectionFile;
@@ -60,6 +74,8 @@ private:
     bool m_isWindowPositionDefined = false;
     QSize m_windowSize = QSize(960, 600);
     QList<int> m_windowSplitterSizes = { 200, 600 };
+
+    Error m_lastError = NoError;
 
 private:
     bool check(const QUrl &url);

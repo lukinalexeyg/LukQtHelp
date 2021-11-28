@@ -107,15 +107,27 @@ void HelpViewer::setWindowSplitterSizes(const QList<int> &sizes)
 
 bool HelpViewer::open(const QUrl &url)
 {
-    if (!HelpTextBrowser::isUrlHttp(url)) {
+    m_lastError = NoError;
+
+    if (url.isEmpty() || HelpTextBrowser::isUrlHelp(url)) {
         if (check(url)) {
             _open(url);
             return true;
         }
     }
 
-    else if (m_openExternalLinksEnabled)
-        return QDesktopServices::openUrl(url);
+    else if (HelpTextBrowser::isUrlHttp(url)) {
+        if (m_openExternalLinksEnabled) {
+            if (QDesktopServices::openUrl(url))
+                return true;
+            m_lastError = ExternalLinkOpenError;
+        }
+        else
+            m_lastError = ExternalLinksAreDisabled;
+    }
+
+    else
+        m_lastError = InvalidSheme;
 
     return false;
 }
@@ -124,8 +136,15 @@ bool HelpViewer::open(const QUrl &url)
 
 bool HelpViewer::check(const QUrl &url)
 {
-    if (m_collectionFile.isEmpty())
+    if (m_collectionFile.isEmpty()) {
+        m_lastError = CollectionFileIsUndefined;
         return false;
+    }
+
+    if (!QFile::exists(m_collectionFile)) {
+        m_lastError = CollectionFileNotFound;
+        return false;
+    }
 
     QSharedPointer<HelpEngine> helpEngine;
 
@@ -134,8 +153,10 @@ bool HelpViewer::check(const QUrl &url)
 
     else {
         helpEngine = QSharedPointer<HelpEngine>::create(m_collectionFile);
-        if (!helpEngine->setupData())
+        if (!helpEngine->setupData()) {
+            m_lastError = CollectionFileSetupError;
             return false;
+        }
     }
 
     bool ok = false;
@@ -169,6 +190,7 @@ bool HelpViewer::check(const QUrl &url)
         return true;
     }
 
+    m_lastError = DataFileIsEmpty;
     return false;
 }
 

@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QScreen>
 #include <QStatusBar>
+#include <QDebug>
 
 static const QLatin1String s_collectionFile("Collection file: ");
 static const QLatin1String s_setCollectionFile("Set %1 collection file");
@@ -48,10 +49,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         statusBar->showMessage(s_collectionFile + s_invalidFile);
     });
 
-    addPushButton(hBoxLayout2, QStringLiteral("Empty"), [this] { m_helpViewer->open(); });
-    addPushButton(hBoxLayout2, QStringLiteral("Constructor"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/constructor.html")); });
-    addPushButton(hBoxLayout2, QStringLiteral("Pattern"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/pattern.html")); });
-    addPushButton(hBoxLayout2, QStringLiteral("Error file"), [this] { m_helpViewer->open(QStringLiteral("qthelp://ural/doc/error.html")); });
+    addPushButton(hBoxLayout2, QStringLiteral("Empty"), [this] {
+        m_helpViewer->open();
+        qDebug() << m_helpViewer->lastError();
+    });
+
+    addPushButton(hBoxLayout2, QStringLiteral("Constructor"), [this] {
+        m_helpViewer->open(QStringLiteral("qthelp://ural/doc/constructor.html"));
+        qDebug() << m_helpViewer->lastError();
+    });
+
+    addPushButton(hBoxLayout2, QStringLiteral("Pattern"), [this] {
+        m_helpViewer->open(QStringLiteral("qthelp://ural/doc/pattern.html"));
+        qDebug() << m_helpViewer->lastError();
+    });
+
+    addPushButton(hBoxLayout2, QStringLiteral("Error file"), [this] {
+        m_helpViewer->open(QStringLiteral("qthelp://ural/doc/error.html"));
+        qDebug() << m_helpViewer->lastError();
+    });
 
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(vBoxLayout);
