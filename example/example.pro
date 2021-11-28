@@ -2,7 +2,7 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = HelpViewerExample
+TARGET = LukQtHelpExample
 
 TEMPLATE = app
 
@@ -30,7 +30,7 @@ RESOURCES +=
 
 DISTFILES +=
 
-include(../HelpViewer/HelpViewer.pri)
+include(../LukQtHelp/LukQtHelp.pri)
 
 DESTDIR = bin
 MOC_DIR = moc
