@@ -32,8 +32,8 @@ public:
     void setHomeSource(const QUrl &url);
     QUrl homeSource() const                                 { return m_homeUrl; }
 
-    void setOpenExternalLinksEnabled(const bool enabled);
-    bool openExternalLinksEnabled() const                   { return m_openExternalLinksEnabled; }
+    void setExternalLinksEnabled(const bool enabled);
+    bool externalLinksEnabled() const                       { return m_externalLinksEnabled; }
 
     void setBasisWidget(QWidget *widget = nullptr)          { m_basisWidget = widget; }
     QWidget *basisWidget() const                            { return m_basisWidget; }
@@ -63,7 +63,7 @@ private:
     QString m_collectionFile;
     QUrl m_homeUrl;
     QUrl m_lastValidUrl;
-    bool m_openExternalLinksEnabled = true;
+    bool m_externalLinksEnabled = true;
 
     QWidget *m_basisWidget;
 

@@ -37,16 +37,16 @@ QUrl HelpWindow::lastSource() const
 
 
 
-void HelpWindow::setOpenExternalLinksEnabled(const bool enabled)
+void HelpWindow::setExternalLinksEnabled(const bool enabled)
 {
-    m_helpTextBrowser->setOpenExternalLinksEnabled(enabled);
+    m_helpTextBrowser->setExternalLinksEnabled(enabled);
 }
 
 
 
-bool HelpWindow::openExternalLinksEnabled() const
+bool HelpWindow::externalLinksEnabled() const
 {
-    return m_helpTextBrowser->openExternalLinksEnabled();
+    return m_helpTextBrowser->externalLinksEnabled();
 }
 
 

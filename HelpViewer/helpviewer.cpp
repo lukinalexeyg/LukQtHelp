@@ -38,12 +38,12 @@ void HelpViewer::setHomeSource(const QUrl &url)
 
 
 
-void HelpViewer::setOpenExternalLinksEnabled(const bool enabled)
+void HelpViewer::setExternalLinksEnabled(const bool enabled)
 {
-    m_openExternalLinksEnabled = enabled;
+    m_externalLinksEnabled = enabled;
 
     if (m_helpWindow != nullptr)
-        m_helpWindow->setOpenExternalLinksEnabled(enabled);
+        m_helpWindow->setExternalLinksEnabled(enabled);
 }
 
 
@@ -117,7 +117,7 @@ bool HelpViewer::open(const QUrl &url)
     }
 
     else if (HelpTextBrowser::isUrlHttp(url)) {
-        if (m_openExternalLinksEnabled) {
+        if (m_externalLinksEnabled) {
             if (QDesktopServices::openUrl(url))
                 return true;
             m_lastError = ExternalLinkOpenError;
@@ -206,7 +206,7 @@ void HelpViewer::_open(const QUrl &url)
         if (!m_helpEngine->isEmpty(m_homeUrl))
             m_helpWindow->setHomeSource(m_homeUrl);
 
-        m_helpWindow->setOpenExternalLinksEnabled(m_openExternalLinksEnabled);
+        m_helpWindow->setExternalLinksEnabled(m_externalLinksEnabled);
 
         m_helpWindow->setWindowState(m_windowState);
         m_helpWindow->setWindowTitle(m_windowTitle);

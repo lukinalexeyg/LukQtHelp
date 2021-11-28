@@ -17,8 +17,8 @@ public:
     void setHomeSource(const QUrl &source) { m_homeSource = source; }
     QUrl lastSource() const;
 
-    void setOpenExternalLinksEnabled(const bool enabled);
-    bool openExternalLinksEnabled() const;
+    void setExternalLinksEnabled(const bool enabled);
+    bool externalLinksEnabled() const;
 
     void setSplitterSizes(const QList<int> &sizes);
     QList<int> splitterSizes() const;

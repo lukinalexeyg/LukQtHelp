@@ -17,7 +17,7 @@ void HelpTextBrowser::setSource(const QUrl &url)
     if (!isUrlHttp(url))
         QTextBrowser::setSource(url);
 
-    else if (m_openExternalLinksEnabled)
+    else if (m_externalLinksEnabled)
         QDesktopServices::openUrl(url);
 }
 

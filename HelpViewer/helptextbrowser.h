@@ -12,8 +12,8 @@ public:
 
     virtual void setSource(const QUrl &url) override;
 
-    void setOpenExternalLinksEnabled(const bool enabled)    { m_openExternalLinksEnabled = enabled; }
-    bool openExternalLinksEnabled() const                   { return m_openExternalLinksEnabled; }
+    void setExternalLinksEnabled(const bool enabled)    { m_externalLinksEnabled = enabled; }
+    bool externalLinksEnabled() const                   { return m_externalLinksEnabled; }
 
     static bool isUrlHttp(const QUrl &url);
     static bool isUrlHelp(const QUrl &url);
@@ -23,7 +23,7 @@ protected:
 
 private:
     QHelpEngine *m_helpEngine;
-    bool m_openExternalLinksEnabled;
+    bool m_externalLinksEnabled;
 
 private:
     virtual QVariant loadResource (const int type, const QUrl &name) override;
