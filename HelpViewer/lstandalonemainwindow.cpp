@@ -1,4 +1,4 @@
-#include "independentwindow.h"
+#include "lstandalonemainwindow.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -7,13 +7,13 @@
 
 
 
-IndependentWindow::IndependentWindow(QWidget *parent) : QMainWindow(parent)
+LStandaloneMainWindow::LStandaloneMainWindow(QWidget *parent) : QMainWindow(parent)
 {
 }
 
 
 
-void IndependentWindow::setSize(const QSize &size, QWidget *basisWidget)
+void LStandaloneMainWindow::setSize(const QSize &size, QWidget *basisWidget)
 {
     QSize s = size;
     const QList<QScreen*> screens = qApp->screens();
@@ -45,7 +45,7 @@ void IndependentWindow::setSize(const QSize &size, QWidget *basisWidget)
 
 
 
-void IndependentWindow::closeEvent(QCloseEvent *event)
+void LStandaloneMainWindow::closeEvent(QCloseEvent *event)
 {
     emit closed();
     event->accept();

@@ -1,14 +1,14 @@
-#ifndef HELPTEXTBROWSER_H
-#define HELPTEXTBROWSER_H
+#ifndef LHELPTEXTBROWSER_H
+#define LHELPTEXTBROWSER_H
 
 #include <QTextBrowser>
 #include <QHelpEngine>
 #include <QWheelEvent>
 
-class HelpTextBrowser : public QTextBrowser
+class LHelpTextBrowser : public QTextBrowser
 {
 public:
-    HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent = nullptr);
+    LHelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent = nullptr);
 
     virtual void setSource(const QUrl &url) override;
 
@@ -29,4 +29,4 @@ private:
     virtual QVariant loadResource (const int type, const QUrl &name) override;
 };
 
-#endif // HELPTEXTBROWSER_H
+#endif // LHELPTEXTBROWSER_H

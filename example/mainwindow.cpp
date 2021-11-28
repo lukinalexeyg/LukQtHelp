@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle(qApp->applicationName());
 
-    m_helpViewer = new HelpViewer(this);
+    m_helpViewer = new LHelpViewer(this);
     m_helpViewer->setWindowTitle(qApp->applicationName());
     m_helpViewer->setHomeSource(QStringLiteral("qthelp://ural/doc/about.html"));
 

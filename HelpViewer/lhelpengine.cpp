@@ -1,21 +1,21 @@
-#include "helpengine.h"
+#include "lhelpengine.h"
 
 
 
-HelpEngine::HelpEngine(const QString &collectionFile, QObject *parent) : QHelpEngine(collectionFile, parent)
+LHelpEngine::LHelpEngine(const QString &collectionFile, QObject *parent) : QHelpEngine(collectionFile, parent)
 {
 }
 
 
 
-bool HelpEngine::isEmpty(const QUrl &url) const
+bool LHelpEngine::isEmpty(const QUrl &url) const
 {
     return fileData(url).isEmpty();
 }
 
 
 
-QUrl HelpEngine::fileUrl(const QString &searchFileName)
+QUrl LHelpEngine::fileUrl(const QString &searchFileName)
 {
     const QStringList documentations = registeredDocumentations();
     QUrl firstFileUrl;

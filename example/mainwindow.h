@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "helpviewer.h"
+#include "lhelpviewer.h"
 
 #include <QMainWindow>
 #include <QCloseEvent>
@@ -16,7 +16,7 @@ public:
     void closeEvent(QCloseEvent*);
 
 private:
-    HelpViewer *m_helpViewer;
+    LHelpViewer *m_helpViewer;
 
     template<typename Func>
     void addPushButton(QHBoxLayout *hBoxLayout, const QString &name, Func func);

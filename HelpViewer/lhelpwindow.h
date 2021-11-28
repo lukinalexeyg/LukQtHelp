@@ -1,17 +1,17 @@
-#ifndef HELPWINDOW_H
-#define HELPWINDOW_H
+#ifndef LHELPWINDOW_H
+#define LHELPWINDOW_H
 
-#include "independentwindow.h"
-#include "helptextbrowser.h"
+#include "lstandalonemainwindow.h"
+#include "lhelptextbrowser.h"
 
 #include <QSplitter>
 
-class HelpWindow : public IndependentWindow
+class LHelpWindow : public LStandaloneMainWindow
 {
     Q_OBJECT
 
 public:
-    HelpWindow(QHelpEngine *helpEngine, QWidget *parent = nullptr);
+    LHelpWindow(QHelpEngine *helpEngine, QWidget *parent = nullptr);
 
     void setSource(const QUrl &source);
     void setHomeSource(const QUrl &source) { m_homeSource = source; }
@@ -25,7 +25,7 @@ public:
 
 private:
     QHelpEngine *m_helpEngine;
-    HelpTextBrowser *m_helpTextBrowser;
+    LHelpTextBrowser *m_helpTextBrowser;
     QSplitter *m_splitter;
     QList<int> m_splitterSizes;
     QStatusBar *m_statusBar;
@@ -43,4 +43,4 @@ private:
     void onTextBrowserHighlighted(const QUrl &link);
 };
 
-#endif // HELPWINDOW_H
+#endif // LHELPWINDOW_H

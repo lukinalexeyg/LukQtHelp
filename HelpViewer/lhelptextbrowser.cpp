@@ -1,10 +1,10 @@
-#include "helptextbrowser.h"
+#include "lhelptextbrowser.h"
 
 #include <QDesktopServices>
 
 
 
-HelpTextBrowser::HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent) :
+LHelpTextBrowser::LHelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent) :
     QTextBrowser(parent),
     m_helpEngine(helpEngine)
 {
@@ -12,7 +12,7 @@ HelpTextBrowser::HelpTextBrowser(QHelpEngine *helpEngine, QWidget *parent) :
 
 
 
-void HelpTextBrowser::setSource(const QUrl &url)
+void LHelpTextBrowser::setSource(const QUrl &url)
 {
     if (!isUrlHttp(url))
         QTextBrowser::setSource(url);
@@ -23,7 +23,7 @@ void HelpTextBrowser::setSource(const QUrl &url)
 
 
 
-QVariant HelpTextBrowser::loadResource(const int type, const QUrl &name)
+QVariant LHelpTextBrowser::loadResource(const int type, const QUrl &name)
 {
     if (isUrlHelp(name))
         return m_helpEngine->fileData(name);
@@ -33,7 +33,7 @@ QVariant HelpTextBrowser::loadResource(const int type, const QUrl &name)
 
 
 
-void HelpTextBrowser::wheelEvent(QWheelEvent *event)
+void LHelpTextBrowser::wheelEvent(QWheelEvent *event)
 {
     if (!event->modifiers().testFlag(Qt::ControlModifier))
         QTextBrowser::wheelEvent(event);
@@ -41,14 +41,14 @@ void HelpTextBrowser::wheelEvent(QWheelEvent *event)
 
 
 
-bool HelpTextBrowser::isUrlHttp(const QUrl &url)
+bool LHelpTextBrowser::isUrlHttp(const QUrl &url)
 {
     return url.scheme().startsWith(QLatin1String("http"));
 }
 
 
 
-bool HelpTextBrowser::isUrlHelp(const QUrl &url)
+bool LHelpTextBrowser::isUrlHelp(const QUrl &url)
 {
     return url.scheme() == QLatin1String("qthelp");
 }

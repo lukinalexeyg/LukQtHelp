@@ -1,15 +1,15 @@
-#ifndef HELPTOOLBAR_H
-#define HELPTOOLBAR_H
+#ifndef LHELPTOOLBAR_H
+#define LHELPTOOLBAR_H
 
 #include <QToolBar>
 #include <QEvent>
 
-class HelpToolBar : public QToolBar
+class LHelpToolBar : public QToolBar
 {
     Q_OBJECT
 
 public:
-    explicit HelpToolBar(QWidget *parent = nullptr);
+    explicit LHelpToolBar(QWidget *parent = nullptr);
 
     void setBackwardEnabled(const bool enabled);
     void setForwardEnabled(const bool enabled);
@@ -32,4 +32,4 @@ private:
     QAction *m_forwardAction;
 };
 
-#endif // HELPTOOLBAR_H
+#endif // LHELPTOOLBAR_H

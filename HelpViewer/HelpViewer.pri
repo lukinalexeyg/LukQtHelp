@@ -5,20 +5,20 @@ DEPENDPATH += $$PWD
 QT += core gui help sql
 
 SOURCES += \
-    $$PWD/helpengine.cpp \
-    $$PWD/helptextbrowser.cpp \
-    $$PWD/helptoolbar.cpp \
-    $$PWD/helpwindow.cpp \
-    $$PWD/helpviewer.cpp \
-    $$PWD/independentwindow.cpp
+    $$PWD/lhelpengine.cpp \
+    $$PWD/lhelptextbrowser.cpp \
+    $$PWD/lhelptoolbar.cpp \
+    $$PWD/lhelpviewer.cpp \
+    $$PWD/lhelpwindow.cpp \
+    $$PWD/lstandalonemainwindow.cpp
 
 HEADERS += \
-    $$PWD/helpengine.h \
-    $$PWD/helptextbrowser.h \
-    $$PWD/helptoolbar.h \
-    $$PWD/helpwindow.h \
-    $$PWD/helpviewer.h \
-    $$PWD/independentwindow.h
+    $$PWD/lhelpengine.h \
+    $$PWD/lhelptextbrowser.h \
+    $$PWD/lhelptoolbar.h \
+    $$PWD/lhelpviewer.h \
+    $$PWD/lhelpwindow.h \
+    $$PWD/lstandalonemainwindow.h
 
 RESOURCES += \
     $$PWD/resources.qrc

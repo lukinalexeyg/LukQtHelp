@@ -1,8 +1,8 @@
-#include "helptoolbar.h"
+#include "lhelptoolbar.h"
 
 
 
-HelpToolBar::HelpToolBar(QWidget *parent) : QToolBar(parent)
+LHelpToolBar::LHelpToolBar(QWidget *parent) : QToolBar(parent)
 {
     setFloatable(false);
     setContextMenuPolicy(Qt::PreventContextMenu);
@@ -11,18 +11,18 @@ HelpToolBar::HelpToolBar(QWidget *parent) : QToolBar(parent)
                                  "QToolBar QToolButton {padding: 2; margin: 0}"));
 
     m_contentsAction = addAction(QIcon(QStringLiteral(":/images/icon-menu.svg")), QString(),
-                                 this, &HelpToolBar::contentsTriggered);
+                                 this, &LHelpToolBar::contentsTriggered);
 
     addSeparator();
 
     m_homeAction = addAction(QIcon(QStringLiteral(":/images/icon-home.svg")), QString(),
-                             this, &HelpToolBar::homeTriggered);
+                             this, &LHelpToolBar::homeTriggered);
 
     m_backwardAction = addAction(QIcon(QStringLiteral(":/images/icon-arrow-left.svg")), QString(),
-                                 this, &HelpToolBar::backwardTriggered);
+                                 this, &LHelpToolBar::backwardTriggered);
 
     m_forwardAction = addAction(QIcon(QStringLiteral(":/images/icon-arrow-right.svg")), QString(),
-                                this, &HelpToolBar::forwardTriggered);
+                                this, &LHelpToolBar::forwardTriggered);
 
     m_contentsAction->setShortcut(Qt::Key_F2);
     m_backwardAction->setShortcut(QKeySequence::MoveToPreviousPage);
@@ -34,21 +34,21 @@ HelpToolBar::HelpToolBar(QWidget *parent) : QToolBar(parent)
 
 
 
-void HelpToolBar::setBackwardEnabled(const bool enabled)
+void LHelpToolBar::setBackwardEnabled(const bool enabled)
 {
     m_backwardAction->setEnabled(enabled);
 }
 
 
 
-void HelpToolBar::setForwardEnabled(const bool enabled)
+void LHelpToolBar::setForwardEnabled(const bool enabled)
 {
     m_forwardAction->setEnabled(enabled);
 }
 
 
 
-void HelpToolBar::changeEvent(QEvent *event)
+void LHelpToolBar::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
         retranslate();
@@ -58,7 +58,7 @@ void HelpToolBar::changeEvent(QEvent *event)
 
 
 
-void HelpToolBar::retranslate()
+void LHelpToolBar::retranslate()
 {
     m_contentsAction->setText(tr("Show/hide contents"));
     m_homeAction->setText(tr("Home"));

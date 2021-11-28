@@ -1,10 +1,10 @@
-#include "helpviewer.h"
+#include "lhelpviewer.h"
 
 #include <QDesktopServices>
 
 
 
-HelpViewer::HelpViewer(QWidget *parent) :
+LHelpViewer::LHelpViewer(QWidget *parent) :
     QObject(parent),
     m_basisWidget(parent)
 {
@@ -12,7 +12,7 @@ HelpViewer::HelpViewer(QWidget *parent) :
 
 
 
-HelpViewer::HelpViewer(const QString &collectionFile, QWidget *parent) :
+LHelpViewer::LHelpViewer(const QString &collectionFile, QWidget *parent) :
     QObject(parent),
     m_collectionFile(collectionFile),
     m_basisWidget(parent)
@@ -21,14 +21,14 @@ HelpViewer::HelpViewer(const QString &collectionFile, QWidget *parent) :
 
 
 
-HelpViewer::~HelpViewer()
+LHelpViewer::~LHelpViewer()
 {
     close();
 }
 
 
 
-void HelpViewer::setHomeSource(const QUrl &url)
+void LHelpViewer::setHomeSource(const QUrl &url)
 {
     m_homeUrl = url;
 
@@ -38,7 +38,7 @@ void HelpViewer::setHomeSource(const QUrl &url)
 
 
 
-void HelpViewer::setExternalLinksEnabled(const bool enabled)
+void LHelpViewer::setExternalLinksEnabled(const bool enabled)
 {
     m_externalLinksEnabled = enabled;
 
@@ -48,7 +48,7 @@ void HelpViewer::setExternalLinksEnabled(const bool enabled)
 
 
 
-void HelpViewer::setWindowState(const Qt::WindowStates states)
+void LHelpViewer::setWindowState(const Qt::WindowStates states)
 {
     m_windowState = states;
 
@@ -58,7 +58,7 @@ void HelpViewer::setWindowState(const Qt::WindowStates states)
 
 
 
-void HelpViewer::setWindowTitle(const QString &title)
+void LHelpViewer::setWindowTitle(const QString &title)
 {
     m_windowTitle = title;
 
@@ -68,7 +68,7 @@ void HelpViewer::setWindowTitle(const QString &title)
 
 
 
-void HelpViewer::setWindowPosition(const QPoint &position)
+void LHelpViewer::setWindowPosition(const QPoint &position)
 {
     m_windowPosition = position;
     m_isWindowPositionDefined = true;
@@ -79,7 +79,7 @@ void HelpViewer::setWindowPosition(const QPoint &position)
 
 
 
-void HelpViewer::setWindowSize(const QSize &size)
+void LHelpViewer::setWindowSize(const QSize &size)
 {
     if (size.isNull())
         return;
@@ -92,7 +92,7 @@ void HelpViewer::setWindowSize(const QSize &size)
 
 
 
-void HelpViewer::setWindowSplitterSizes(const QList<int> &sizes)
+void LHelpViewer::setWindowSplitterSizes(const QList<int> &sizes)
 {
     if (sizes.count() != 2)
         return;
@@ -105,18 +105,18 @@ void HelpViewer::setWindowSplitterSizes(const QList<int> &sizes)
 
 
 
-bool HelpViewer::open(const QUrl &url)
+bool LHelpViewer::open(const QUrl &url)
 {
     m_lastError = NoError;
 
-    if (url.isEmpty() || HelpTextBrowser::isUrlHelp(url)) {
+    if (url.isEmpty() || LHelpTextBrowser::isUrlHelp(url)) {
         if (check(url)) {
             _open(url);
             return true;
         }
     }
 
-    else if (HelpTextBrowser::isUrlHttp(url)) {
+    else if (LHelpTextBrowser::isUrlHttp(url)) {
         if (m_externalLinksEnabled) {
             if (QDesktopServices::openUrl(url))
                 return true;
@@ -134,7 +134,7 @@ bool HelpViewer::open(const QUrl &url)
 
 
 
-bool HelpViewer::check(const QUrl &url)
+bool LHelpViewer::check(const QUrl &url)
 {
     if (m_collectionFile.isEmpty()) {
         m_lastError = CollectionFileIsUndefined;
@@ -146,13 +146,13 @@ bool HelpViewer::check(const QUrl &url)
         return false;
     }
 
-    QSharedPointer<HelpEngine> helpEngine;
+    QSharedPointer<LHelpEngine> helpEngine;
 
     if (!m_helpEngine.isNull() && m_helpEngine->collectionFile() == m_collectionFile)
         helpEngine = m_helpEngine;
 
     else {
-        helpEngine = QSharedPointer<HelpEngine>::create(m_collectionFile);
+        helpEngine = QSharedPointer<LHelpEngine>::create(m_collectionFile);
         if (!helpEngine->setupData()) {
             m_lastError = CollectionFileSetupError;
             return false;
@@ -196,10 +196,10 @@ bool HelpViewer::check(const QUrl &url)
 
 
 
-void HelpViewer::_open(const QUrl &url)
+void LHelpViewer::_open(const QUrl &url)
 {
     if (m_helpWindow == nullptr) {
-        m_helpWindow = new HelpWindow(m_helpEngine.data());
+        m_helpWindow = new LHelpWindow(m_helpEngine.data());
 
         m_helpWindow->setSource(m_lastValidUrl);
 
@@ -220,7 +220,7 @@ void HelpViewer::_open(const QUrl &url)
 
         m_helpWindow->setSplitterSizes(m_windowSplitterSizes);
 
-        connect(m_helpWindow, &HelpWindow::destroyed, this, &HelpViewer::onWindowDestroyed);
+        connect(m_helpWindow, &LHelpWindow::destroyed, this, &LHelpViewer::onWindowDestroyed);
 
         m_helpWindow->show();
     }
@@ -233,7 +233,7 @@ void HelpViewer::_open(const QUrl &url)
 
 
 
-void HelpViewer::onWindowDestroyed()
+void LHelpViewer::onWindowDestroyed()
 {
     m_lastValidUrl = m_helpWindow->lastSource();
     m_windowState = m_helpWindow->windowState();
@@ -242,12 +242,12 @@ void HelpViewer::onWindowDestroyed()
     m_windowSize = m_helpWindow->size();
     m_windowSplitterSizes = m_helpWindow->splitterSizes();
     m_helpWindow = nullptr;
-    m_helpEngine = QSharedPointer<HelpEngine>(nullptr);
+    m_helpEngine = QSharedPointer<LHelpEngine>(nullptr);
 }
 
 
 
-void HelpViewer::close()
+void LHelpViewer::close()
 {
     if (m_helpWindow != nullptr)
         m_helpWindow->close();

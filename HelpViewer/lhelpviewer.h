@@ -1,10 +1,10 @@
-#ifndef HELPVIEWER_H
-#define HELPVIEWER_H
+#ifndef LHELPVIEWER_H
+#define LHELPVIEWER_H
 
-#include "helpengine.h"
-#include "helpwindow.h"
+#include "lhelpengine.h"
+#include "lhelpwindow.h"
 
-class HelpViewer : public QObject
+class LHelpViewer : public QObject
 {
     Q_OBJECT
 
@@ -21,10 +21,10 @@ public:
     };
 
 public:
-    explicit HelpViewer(QWidget *parent = nullptr);
-    explicit HelpViewer(const QString &collectionFile, QWidget *parent = nullptr);
+    explicit LHelpViewer(QWidget *parent = nullptr);
+    explicit LHelpViewer(const QString &collectionFile, QWidget *parent = nullptr);
 
-    ~HelpViewer();
+    ~LHelpViewer();
 
     void setCollectionFile(const QString &collectionFile)   { m_collectionFile = collectionFile; }
     QString collectionFile() const                          { return m_collectionFile; }
@@ -59,7 +59,7 @@ public:
     Error lastError() const                                 { return m_lastError; }
 
 private:
-    QSharedPointer<HelpEngine> m_helpEngine;
+    QSharedPointer<LHelpEngine> m_helpEngine;
     QString m_collectionFile;
     QUrl m_homeUrl;
     QUrl m_lastValidUrl;
@@ -67,7 +67,7 @@ private:
 
     QWidget *m_basisWidget;
 
-    HelpWindow *m_helpWindow = nullptr;
+    LHelpWindow *m_helpWindow = nullptr;
     Qt::WindowStates m_windowState;
     QString m_windowTitle;
     QPoint m_windowPosition;
@@ -83,4 +83,4 @@ private:
     void onWindowDestroyed();
 };
 
-#endif // HELPVIEWER_H
+#endif // LHELPVIEWER_H
