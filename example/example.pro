@@ -1,10 +1,13 @@
-QT += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui widgets
 
 TARGET = LukQtHelpExample
 
 TEMPLATE = app
+
+QMAKE_TARGET = $${TARGET}
+QMAKE_TARGET_PRODUCT = $${TARGET}
+
+DEFINES += APP_PRODUCT=\\\"$$QMAKE_TARGET_PRODUCT\\\"
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
